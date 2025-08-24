@@ -20,12 +20,12 @@ export default function HeaderSearch() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!query) {
-      setResults([]);
+    if (query.length < 3) {
+      setResults([]); // clear results if less than 3 letters
       return;
     }
 
-    const timeout = setTimeout(async () => {
+    const debounceTimeout = setTimeout(async () => {
       setLoading(true);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
@@ -36,9 +36,9 @@ export default function HeaderSearch() {
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, 800); // 500ms delay
 
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(debounceTimeout); // cancel previous request if typing continues
   }, [query]);
 
   const handleWatch = (url: string) => {
@@ -55,7 +55,7 @@ export default function HeaderSearch() {
         className="px-4 py-2 rounded shadow w-full"
       />
 
-      {query && (
+      {query.length >= 3 && (
         <div className="absolute mt-2 bg-white shadow-lg rounded w-full max-h-96 overflow-y-auto z-50">
           {loading ? (
             <p className="p-2 text-gray-500">Searching...</p>
