@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+
 
 interface Module {
   id: number;
@@ -104,20 +104,7 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          <div className="flex space-x-4">
-            <Link
-              href={`/my-kuppi?faculty=${selectedFaculty}&department=${selectedDepartment}&semester=${selectedSemester}`}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors shadow-lg"
-            >
-              My Kuppi
-            </Link>
-            <Link
-              href={`/browse-kuppi?faculty=${selectedFaculty}&department=${selectedDepartment}&semester=${selectedSemester}`}
-              className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-lg"
-            >
-              Browse Kuppi
-            </Link>
-          </div>
+          
         </div>
 
         {/* Modules Grid */}
