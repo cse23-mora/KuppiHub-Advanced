@@ -13,7 +13,7 @@ export async function GET(request) {
       module:modules(code, name, description),
       faculty:faculties(name),
       department:departments(name),
-      batch:batches(name),
+
       semester:semesters(name)
     `)
     .eq('faculty_id', faculty_id)

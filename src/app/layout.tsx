@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
+import HeaderSearch from "./dashboard/components/HeaderSearch";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,11 +27,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
       >
-        <Suspense fallback={<div>Loading...</div>}>
-          {children}
-        </Suspense>
+        {/* Header */}
+       <header className="p-4 bg-white shadow flex items-center justify-between">
+  <h1 className="font-bold text-xl">KuppiHub</h1>
+  <HeaderSearch />
+</header>
+        {/* Main content */}
+        <main>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        </main>
       </body>
     </html>
   );
