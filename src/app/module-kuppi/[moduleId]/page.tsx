@@ -10,6 +10,7 @@ interface Video {
   telegram_links?: string[];
   material_urls?: string[];
   is_kuppi?: boolean;
+  discription?: string;
 }
 
 export default function ModuleKuppiPage() {
@@ -82,6 +83,10 @@ export default function ModuleKuppiPage() {
                 <h2 className="text-xl font-semibold mb-2">
                   {video.title} {video.is_kuppi && <span className="text-green-500 font-bold">(Kuppi)</span>}
                 </h2>
+
+                {video.discription && (
+                  <p className="text-gray-600 mb-4">{video.discription}</p>
+                )}
 
                 <div className="flex flex-col gap-2">
               {video.urls && video.urls.length > 0 && (
