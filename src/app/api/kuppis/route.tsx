@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     // Fetch from Supabase
     const { data, error } = await supabase
       .from('videos')
-      .select('id, title, urls, telegram_links, material_urls, is_kuppi,discription')
+      .select('id, title, urls, telegram_links, material_urls, is_kuppi, description')
       .eq('module_id', Number(moduleId))
       .order('created_at', { ascending: false });
 
