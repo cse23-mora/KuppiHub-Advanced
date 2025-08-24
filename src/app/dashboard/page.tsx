@@ -40,7 +40,9 @@ export default function DashboardPage() {
 
   const fetchModules = async () => {
     try {
-      // Mock data - replace with actual Supabase call
+      
+      // Mock data - replace with a
+      // ctual Supabase call
       const mockModules = [
         { id: 1, code: 'CS101', name: 'Introduction to Programming', description: 'Basic programming concepts', video_count: 15, kuppi_count: 8 },
         { id: 2, code: 'CS102', name: 'Data Structures', description: 'Fundamental data structures', video_count: 12, kuppi_count: 5 },

@@ -27,46 +27,18 @@ export default function DepartmentPage() {
     }
   }, [searchParams, router]);
 
-  const fetchDepartments = async (facultyId: number) => {
-    try {
-      // Mock data - replace with actual Supabase call
-      const mockDepartments = {
-        1: [ // Engineering
-          { id: 1, name: 'Computer Science & Engineering', faculty_id: 1 },
-          { id: 2, name: 'Electrical Engineering', faculty_id: 1 },
-          { id: 3, name: 'Mechanical Engineering', faculty_id: 1 },
-          { id: 4, name: 'Civil Engineering', faculty_id: 1 }
-        ],
-        2: [ // Science
-          { id: 5, name: 'Physics', faculty_id: 2 },
-          { id: 6, name: 'Chemistry', faculty_id: 2 },
-          { id: 7, name: 'Mathematics', faculty_id: 2 },
-          { id: 8, name: 'Biology', faculty_id: 2 }
-        ],
-        3: [ // Medicine
-          { id: 9, name: 'Medicine', faculty_id: 3 },
-          { id: 10, name: 'Surgery', faculty_id: 3 },
-          { id: 11, name: 'Pediatrics', faculty_id: 3 }
-        ],
-        4: [ // Arts
-          { id: 12, name: 'English Literature', faculty_id: 4 },
-          { id: 13, name: 'History', faculty_id: 4 },
-          { id: 14, name: 'Philosophy', faculty_id: 4 }
-        ],
-        5: [ // Business
-          { id: 15, name: 'Business Administration', faculty_id: 5 },
-          { id: 16, name: 'Accounting', faculty_id: 5 },
-          { id: 17, name: 'Marketing', faculty_id: 5 }
-        ]
-      };
-      
-      setDepartments(mockDepartments[facultyId as keyof typeof mockDepartments] || []);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load departments');
-      setLoading(false);
-    }
-  };
+const fetchDepartments = async (faculty_id: number) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/departments?faculty_id=${faculty_id}`);
+    const data = await response.json();
+    setDepartments(data);
+    setLoading(false);
+  } catch (err) {
+    setError('Failed to load departments');
+    setLoading(false);
+  }
+};
+
 
   const handleDepartmentSelect = (departmentId: number) => {
     localStorage.setItem('selectedDepartment', departmentId.toString());

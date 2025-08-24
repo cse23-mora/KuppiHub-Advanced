@@ -20,23 +20,27 @@ export default function FacultyPage() {
 
   const fetchFaculties = async () => {
     try {
-      // Mock data for now - replace with actual Supabase call
-      const mockFaculties = [
-        { id: 1, name: 'Faculty of Engineering' },
-        { id: 2, name: 'Faculty of Science' },
-        { id: 3, name: 'Faculty of Medicine' },
-        { id: 4, name: 'Faculty of Arts' },
-        { id: 5, name: 'Faculty of Business' }
-      ];
-      
-      setFaculties(mockFaculties);
-      setLoading(false);
+      fetch ('http://localhost:3000/api/faculties', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        setFaculties(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError('Failed to load faculties');
+        setLoading(false);
+      });
     } catch (err) {
       setError('Failed to load faculties');
       setLoading(false);
     }
   };
-
+     
   const handleFacultySelect = (facultyId: number) => {
     // Store selection in localStorage or state management
     localStorage.setItem('selectedFaculty', facultyId.toString());
