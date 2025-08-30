@@ -24,6 +24,6 @@
 }
 
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/search/route.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/search/route.js", "src/app/api/kuppis/route.js"],
   "exclude": ["node_modules"]
 }

@@ -11,6 +11,10 @@ interface Video {
   material_urls?: string[];
   is_kuppi?: boolean;
   description?: string;
+  language_code?: string;
+  created_at?: string;
+  owner_name?: string;
+  owner_image?: string;
 }
 
 export default function ModuleKuppiPage() {
@@ -88,22 +92,86 @@ export default function ModuleKuppiPage() {
                   </svg>
                 </button>
 
+
+
+
                 {activeVideoId === video.id && (
                   <div className="px-4 sm:px-5 pb-5 border-t border-gray-200">
-                    {video.description && <p className="text-gray-600 mt-4 mb-4 text-sm sm:text-base">{video.description}</p>}
-                    
+                    {video.description && (
+                      <p className="text-gray-600 mt-4 mb-4 text-sm sm:text-base">
+                        {video.description}
+                      </p>
+                    )}
+
+                    {/* NEW: Owner info */}
+                    {video.owner_name && (
+                      <div className="flex items-center gap-3 mb-4">
+                        {video.owner_image_url && (
+                          <img
+                            src={video.owner_image_url}
+                            alt={video.owner_name}
+                            className="w-10 h-10 rounded-full object-cover border"
+                          />
+                        )}
+                        <div>
+                          <p className="font-medium text-gray-800">{video.owner_name}</p>
+                          {video.faculty_id && (
+                            <p className="text-xs text-gray-500">
+                              Faculty ID: {video.faculty_id}
+                            </p>
+                          )}
+                          {video.department_id && (
+                            <p className="text-xs text-gray-500">
+                              Department ID: {video.department_id}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* NEW: Extra metadata */}
+                    <div className="text-sm text-gray-500 mb-4 flex flex-wrap gap-3">
+                      {video.language_code && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md">
+                          Language: {video.language_code.toUpperCase()}
+                        </span>
+                      )}
+                      {video.created_at && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+                          Uploaded: {new Date(video.created_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+
                     <div className="space-y-3">
                       {video.urls.map((url, index) => (
                         <button
                           key={`url-${index}`}
-                          onClick={() => router.push(`/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(url)}`)}
+                          onClick={() =>
+                            router.push(
+                              `/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(
+                                url
+                              )}`
+                            )
+                          }
                           className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                         >
-                          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" /></svg>
-                          Watch Video {video.urls.length > 1 ? index + 1 : ''}
+                          <svg
+                            className="w-5 h-5 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Watch Video {video.urls.length > 1 ? index + 1 : ""}
                         </button>
                       ))}
 
+                      {/* telegram + material links remain same */}
                       <div className="flex flex-wrap gap-2">
                         {video.telegram_links?.map((link, index) => (
                           <a
@@ -113,8 +181,14 @@ export default function ModuleKuppiPage() {
                             rel="noopener noreferrer"
                             className="flex-grow flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                           >
-                            <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
-                            Telegram {video.telegram_links.length > 1 ? index + 1 : ''}
+                            <svg
+                              className="w-4 h-4 mr-1.5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                            </svg>
+                            Telegram {video.telegram_links.length > 1 ? index + 1 : ""}
                           </a>
                         ))}
 
@@ -126,10 +200,21 @@ export default function ModuleKuppiPage() {
                             rel="noopener noreferrer"
                             className="flex-grow flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                           >
-                            <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
-                            Material {video.material_urls.length > 1 ? index + 1 : ''}
+                            <svg
+                              className="w-4 h-4 mr-1.5"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                clipRule="evenodd"
+                              ></path>
+                            </svg>
+                            Material {video.material_urls.length > 1 ? index + 1 : ""}
                           </a>
                         ))}
+
                       </div>
                     </div>
                   </div>
