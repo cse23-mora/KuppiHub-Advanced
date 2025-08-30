@@ -29,7 +29,7 @@ export default function DepartmentPage() {
 
 const fetchDepartments = async (faculty_id: number) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/departments?faculty_id=${faculty_id}`);
+    const response = await fetch(`api/departments?faculty_id=${faculty_id}`);
     const data = await response.json();
     setDepartments(data);
     setLoading(false);

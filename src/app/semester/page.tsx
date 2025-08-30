@@ -17,40 +17,46 @@ export default function SemesterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const facultyId = searchParams.get('faculty');
-    const departmentId = searchParams.get('department');
-    
-    if (facultyId && departmentId) {
-      setSelectedFaculty(facultyId);
-      setSelectedDepartment(departmentId);
-      fetchSemesters();
-    } else {
-      router.push('/faculty');
-    }
-  }, [searchParams, router]);
+useEffect(() => {
+  const facultyId = searchParams.get('faculty');
+  const departmentId = searchParams.get('department');
+  
+  if (facultyId && departmentId) {
+    setSelectedFaculty(facultyId);
+    setSelectedDepartment(departmentId);
 
-const fetchSemesters = async () => {
+    // Convert to numbers and pass to fetchSemesters
+    fetchSemesters(Number(facultyId), Number(departmentId));
+  } else {
+    router.push('/faculty');
+  }
+}, [searchParams, router]);
+
+  const fetchSemesters = async (faculty_id: number, department_id: number) => {
   try {
-    // Mock data - replace with actual Supabase call
-    const mockSemesters = [
-      { id: 1, name: 'Semester 1' },
-      { id: 2, name: 'Semester 2' },
-      { id: 3, name: 'Semester 3' },
-      { id: 4, name: 'Semester 4' },
-      { id: 5, name: 'Semester 5' },
-      { id: 6, name: 'Semester 6' },
-      { id: 7, name: 'Semester 7' },
-      { id: 8, name: 'Semester 8' }
-    ];
-    
-    setSemesters(mockSemesters);
+    setLoading(true);
+
+    // Fetch from your API
+    const response = await fetch(
+      `api/semesters?faculty_id=${faculty_id}&department_id=${department_id}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+
+    // Set the semesters in state
+    setSemesters(data);
     setLoading(false);
   } catch (err) {
+    console.error(err);
     setError('Failed to load semesters');
     setLoading(false);
   }
 };
+
 
 const handleSemesterSelect = (semesterId: number) => {
   // Navigate to the modules page and pass faculty, department, semester as query params
