@@ -13,8 +13,16 @@ interface Video {
   description?: string;
   language_code?: string;
   created_at?: string;
-  owner_name?: string;
-  owner_image?: string;
+  owner?:{
+
+    name: string;
+
+    department: {
+   
+      name: string;
+    };
+  }
+ 
 }
 
 export default function ModuleKuppiPage() {
@@ -104,27 +112,18 @@ export default function ModuleKuppiPage() {
                     )}
 
                     {/* NEW: Owner info */}
-                    {video.owner_name && (
+                    {video.owner?.name && (
                       <div className="flex items-center gap-3 mb-4">
-                        {video.owner_image_url && (
-                          <img
-                            src={video.owner_image_url}
-                            alt={video.owner_name}
-                            className="w-10 h-10 rounded-full object-cover border"
-                          />
-                        )}
+
+        
                         <div>
                           <p className="font-medium text-gray-800">{video.owner_name}</p>
-                          {video.faculty_id && (
+                          {video.owner.department.name && (
                             <p className="text-xs text-gray-500">
-                              Faculty ID: {video.faculty_id}
+                              Department of  {video.owner.department.name}
                             </p>
                           )}
-                          {video.department_id && (
-                            <p className="text-xs text-gray-500">
-                              Department ID: {video.department_id}
-                            </p>
-                          )}
+                    
                         </div>
                       </div>
                     )}

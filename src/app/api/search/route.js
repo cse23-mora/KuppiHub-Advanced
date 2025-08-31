@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import supabase from "../../../lib/supabase";
 
 export async function GET(req) {
@@ -5,29 +6,21 @@ export async function GET(req) {
   const query = searchParams.get("q") || "";
 
   if (!query) {
-    return new Response(JSON.stringify({ data: [], error: "Query missing" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ data: [] });
   }
 
-  try {
-    const { data, error } = await supabase
-      .from("videos")
-      .select("*")
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+  // Combine multiple ilike conditions properly for Supabase
+  const ilikeQuery = `title.ilike.%${query}%,description.ilike.%${query}%,module_code.ilike.%${query}%,module_name.ilike.%${query}%,module_description.ilike.%${query}%,student_name.ilike.%${query}%`;
 
-    if (error) throw error;
+  const { data, error } = await supabase
+    .from("videos_search_mv")
+    .select("*")
+    .or(ilikeQuery)
+    .limit(20);
 
-    return new Response(JSON.stringify({ data }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error(err); // log the actual error
-    return new Response(
-      JSON.stringify({ data: [], error: err.message || "Search failed" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  return NextResponse.json({ data });
 }

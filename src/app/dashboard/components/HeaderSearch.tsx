@@ -21,7 +21,7 @@ export default function HeaderSearch() {
 
   useEffect(() => {
     if (query.length < 3) {
-      setResults([]); // clear results if less than 3 letters
+      setResults([]);
       return;
     }
 
@@ -29,16 +29,16 @@ export default function HeaderSearch() {
       setLoading(true);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        setResults(data.data || []);
+        const json = await res.json();
+        setResults(json.data || []);
       } catch (err) {
-        console.error(err);
+        console.error("Search failed", err);
       } finally {
         setLoading(false);
       }
-    }, 800); // 500ms delay
+    }, 800); // 800ms debounce
 
-    return () => clearTimeout(debounceTimeout); // cancel previous request if typing continues
+    return () => clearTimeout(debounceTimeout);
   }, [query]);
 
   const handleWatch = (url: string) => {
@@ -51,8 +51,8 @@ export default function HeaderSearch() {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search modules, kuppi, videos..."
-        className="px-4 py-2 rounded shadow w-full"
+        placeholder="Search modules, Kuppi, videos..."
+        className="w-full px-4 py-2 rounded shadow focus:outline-none focus:ring focus:ring-blue-300"
       />
 
       {query.length >= 3 && (
@@ -67,7 +67,9 @@ export default function HeaderSearch() {
                 <p className="font-semibold">
                   {video.title} {video.is_kuppi && "(Kuppi)"}
                 </p>
-                <p className="text-gray-600 text-sm mb-2">{video.description}</p>
+                {video.description && (
+                  <p className="text-gray-600 text-sm mb-2">{video.description}</p>
+                )}
 
                 <div className="flex flex-wrap gap-2">
                   {video.urls.map((url, idx) => (
