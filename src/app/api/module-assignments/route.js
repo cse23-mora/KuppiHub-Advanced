@@ -9,11 +9,10 @@ export async function GET(request) {
   const { data, error } = await supabase
     .from('module_assignments')
     .select(`
-      id,
+      module_id,
       module:modules(code, name, description),
       faculty:faculties(name),
       department:departments(name),
-
       semester:semesters(name)
     `)
     .eq('faculty_id', faculty_id)

@@ -20,7 +20,7 @@ export default function FacultyPage() {
 
   const fetchFaculties = async () => {
     try {
-      fetch ('http://localhost:3000/api/faculties', {
+      fetch ('./api/faculties', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

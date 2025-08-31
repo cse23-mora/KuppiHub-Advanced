@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 
 interface ModuleData {
-  id: number;
+  module_id: number;
   module: {
     code: string;
     name: string;
@@ -128,13 +128,13 @@ export default function ModulesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {modules.map((mod, index) => (
               <motion.div
-                key={mod.id}
+                key={mod.module_id}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl overflow-hidden group transform transition-all duration-300 hover:scale-105 cursor-pointer border border-blue-50"
-                onClick={() => handleModuleSelect(mod.id)}
+                onClick={() => handleModuleSelect(mod.module_id)}
               >
                 <div className="p-6">
                   <div className="w-14 h-14 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-200 group-hover:to-indigo-200 transition-all duration-300">

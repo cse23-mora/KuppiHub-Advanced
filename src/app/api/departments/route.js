@@ -10,7 +10,7 @@ export async function GET(request) {
     .from('departments')
     .select('id, name, faculty_id')
     .eq('faculty_id', faculty_id)
-    .order('name', { ascending: true });
+    .order('id', { ascending: true });
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
