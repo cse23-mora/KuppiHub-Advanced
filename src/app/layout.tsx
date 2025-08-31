@@ -4,6 +4,11 @@ import { Suspense } from "react";
 import "./globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import ScrollToTopButton from "./components/ScrollToTopButton";
+
+
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -34,6 +39,7 @@ export default function RootLayout({
   </main>
 
   <Footer />
+  <ScrollToTopButton />
 </body>
 
     </html>
