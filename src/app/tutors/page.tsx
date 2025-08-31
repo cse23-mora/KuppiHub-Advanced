@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import Preloader from "../components/Preloader";
 interface Student {
   id: number;
   name: string;
@@ -21,7 +21,7 @@ export default function TutorsPage() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/tutors");
+        const res = await fetch("./api/tutors");
         if (!res.ok) throw new Error("Failed to fetch tutors");
         const data = await res.json();
         setStudents(data.students);
@@ -35,7 +35,7 @@ export default function TutorsPage() {
     fetchStudents();
   }, []);
 
-  if (loading) return <p>Loading tutors...</p>;
+  if (loading) return <Preloader />;
   if (error) return <p>Error: {error}</p>;
 
   return (

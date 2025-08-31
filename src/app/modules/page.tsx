@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-
+import Preloader from "../components/Preloader";
 interface ModuleData {
   module_id: number;
   module: {
@@ -63,13 +63,7 @@ export default function ModulesPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <p className="text-center text-xl font-medium text-blue-600 animate-pulse">Loading modules...</p>
-      </div>
-    );
-  }
+  if (loading) return <Preloader />;
 
   if (error) {
     return (

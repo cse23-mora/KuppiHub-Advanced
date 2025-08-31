@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from "framer-motion";
 import BackButton from '../components/BackButton';
+import Preloader from '../components/Preloader';
+
 interface Department {
   id: number;
   name: string;
@@ -49,13 +51,7 @@ export default function DepartmentPage() {
     router.push('/faculty');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-xl text-blue-600">Loading departments...</div>
-      </div>
-    );
-  }
+  if (loading) return <Preloader />;
 
   if (error) {
     return (

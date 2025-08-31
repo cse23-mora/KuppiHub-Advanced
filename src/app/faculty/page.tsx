@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
+import Preloader from '../components/Preloader';
 interface Faculty {
   id: number;
   name: string;
@@ -47,13 +47,7 @@ export default function FacultyPage() {
     router.push(`/department?faculty=${facultyId}`);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading faculties...</div>
-      </div>
-    );
-  }
+  if (loading) return <Preloader />;
 
   if (error) {
     return (

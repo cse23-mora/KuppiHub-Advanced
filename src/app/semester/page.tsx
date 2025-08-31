@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from "framer-motion";
-
+import Preloader from '../components/Preloader';
 interface Semester {
   id: number;
   name: string;
@@ -60,14 +60,7 @@ export default function SemesterPage() {
     router.push(`/department?faculty=${selectedFaculty}`);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-xl text-blue-600">Loading semesters...</div>
-      </div>
-    );
-  }
-
+  if (loading) return <Preloader />;
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">

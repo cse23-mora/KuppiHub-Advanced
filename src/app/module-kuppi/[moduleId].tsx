@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-
+import Preloader from "../components/Preloader";
 interface Kuppi {
   id: number;
   moduleId: number;
@@ -23,7 +23,7 @@ export default function ModuleKuppiPage() {
       .finally(() => setLoading(false));
   }, [moduleId]);
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  if (loading) return <Preloader />;
 
   return (
     <div className="p-6">
