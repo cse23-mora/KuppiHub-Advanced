@@ -5,12 +5,43 @@ import Preloader from '../components/Preloader';
 
 export default function Contact() {
   const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitStatus, setSubmitStatus] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
     const timer = setTimeout(() => setLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitStatus('Submitting...');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setSubmitStatus('Message sent successfully!');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setSubmitStatus(result.error || 'Failed to send message');
+      }
+    } catch (error) {
+      setSubmitStatus('Error sending message');
+      console.error(error);
+    }
+  };
 
   if (loading) return <Preloader />;
 
@@ -26,7 +57,7 @@ export default function Contact() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           {/* Contact Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Name
@@ -35,7 +66,8 @@ export default function Contact() {
                 type="text"
                 name="name"
                 id="name"
-                autoComplete="name"
+                value={formData.name}
+                onChange={handleChange}
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -49,7 +81,8 @@ export default function Contact() {
                 type="email"
                 name="email"
                 id="email"
-                autoComplete="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -62,7 +95,9 @@ export default function Contact() {
               <textarea
                 id="message"
                 name="message"
-                rows="4"
+                rows={4}
+                value={formData.message}
+                onChange={handleChange}
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500"
               ></textarea>
@@ -76,6 +111,7 @@ export default function Contact() {
                 Send Message
               </button>
             </div>
+            {submitStatus && <p className="mt-2 text-sm text-gray-700">{submitStatus}</p>}
           </form>
 
           {/* 3D Model */}

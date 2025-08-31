@@ -20,7 +20,7 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: sans-serif;
   min-height: 100vh;
   /* Gradient background */
   background: linear-gradient(to right, #bfdbfe, #c4b5fd, #3b82f6);
