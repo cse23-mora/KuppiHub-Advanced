@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation';
+
+import Faculty from './faculty/page'; // import the Faculty component
 
 export default function HomePage() {
-  redirect('/faculty');
+  return <Faculty />; // render Faculty directly
 }

@@ -62,7 +62,7 @@ export default function DepartmentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className=" bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center mb-12">
            <BackButton onClick={handleBack} className="mb-8" />
