@@ -46,7 +46,7 @@ export default function TutorsPage() {
           className="border rounded-lg p-4 shadow hover:shadow-lg transition"
         >
           <img
-            src={student.image_url || "/default-avatar.png"}
+            src={student.image_url || "/tutor.png"}
             alt={student.name}
             className="w-24 h-24 rounded-full mx-auto mb-4"
           />

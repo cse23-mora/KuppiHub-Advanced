@@ -7,6 +7,7 @@ export async function GET() {
       .from('students')
       .select(`
         id,
+        index_no,
         name,
         image_url,
         linkedin_url,
@@ -17,6 +18,7 @@ export async function GET() {
 
     if (error) throw error;
 
+
     // Map to get number of videos and unique module names
     const students = data.map(student => {
       const moduleNames = Array.from(
@@ -26,6 +28,9 @@ export async function GET() {
             .filter(Boolean)
         )
       );
+      if (student.name === 'Unknown') {
+        student.name=student.index_no;
+      }
 
       return {
         id: student.id,
