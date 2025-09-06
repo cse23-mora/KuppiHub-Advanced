@@ -2,7 +2,7 @@
 export interface Video {
   id: number;
   title: string;
-  urls: string[];
+youtube_links: string[];
   telegram_links?: string[];
   material_urls?: string[];
   is_kuppi?: boolean;

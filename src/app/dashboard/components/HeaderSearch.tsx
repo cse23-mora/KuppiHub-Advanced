@@ -8,7 +8,7 @@ interface Video {
   id: number;
   title: string;
   description: string;
-  urls: string[];
+  youtube_links: string[];
   telegram_links?: string[];
   material_urls?: string[];
   is_kuppi?: boolean;
@@ -72,7 +72,7 @@ export default function HeaderSearch() {
                   </p>
                   <p className="text-gray-600 text-sm mb-2">{video.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {video.urls.map((url, idx) => (
+                    {video.youtube_links.map((url, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleWatch(url)}
@@ -164,7 +164,7 @@ export default function HeaderSearch() {
               <p className="text-gray-800 text-sm mb-2">{video.description}</p>
 
               <div className="flex flex-wrap gap-2">
-                {video.urls.map((url, idx) => (
+                {video.youtube_links.map((url, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleWatch(url)}

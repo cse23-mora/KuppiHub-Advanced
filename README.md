@@ -83,7 +83,7 @@ module_assignments (id, module_id, faculty_id, department_id, batch_id, semester
 student_additional_modules (id, student_id, module_id)
 
 -- Video content
-videos (id, module_id, title, urls, telegram_links, material_urls, is_kuppi, owner_id, created_at)
+videos (id, module_id, title, youtube_links, telegram_links, material_urls, is_kuppi, student_id, created_at)
 ```
 
 ## 🚀 Getting Started

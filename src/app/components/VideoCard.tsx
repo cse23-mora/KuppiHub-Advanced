@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 interface Video {
   id: number;
   title: string;
-  urls: string[];
+  youtube_links: string[];
   telegram_links?: string[];
   material_urls?: string[];
   is_kuppi?: boolean;
@@ -97,11 +97,11 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
           </div>
           <div>
             <p className="font-medium text-gray-800">{video.owner.name}</p>
-            {video.owner.department.name && (
-              <p className="text-xs text-gray-500">
-                Department of {video.owner.department.name}
-              </p>
-            )}
+       {video.owner.department?.name && (
+  <p className="text-xs text-gray-500">
+    Department of {video.owner.department.name}
+  </p>
+)}
           </div>
         </div>
       )}
@@ -120,7 +120,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
       </div>
 
       <div className="space-y-3">
-        {video.urls.map((url, index) => (
+        {video.youtube_links.map((url, index) => (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -143,7 +143,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
                 clipRule="evenodd"
               />
             </svg>
-            Watch Video {video.urls.length > 1 ? index + 1 : ""}
+            Watch Video {video.youtube_links.length > 1 ? index + 1 : ""}
           </motion.button>
         ))}
 

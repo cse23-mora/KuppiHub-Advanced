@@ -15,7 +15,7 @@ export async function GET(req) {
       .select(`
         id,
         title,
-        urls,
+        youtube_links,
         telegram_links,
         material_urls,
         is_kuppi,

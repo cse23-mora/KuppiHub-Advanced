@@ -2,7 +2,7 @@
 import Link from 'next/link';
 export default function Footer() {
   return (
-    <footer className="bg-gradient-href-r from-blue-300 via-purple-200 href-blue-00 text-gray-800 ">
+    <footer className="bg-gradient-href-r from-blue-300 via-purple-200 href-blue-00 text-gray-800 max-h-1/6">
       <div className="max-w-5xl mx-auto px-6 py-6">
         <div className="flex flex-col md:flex-row md:justify-between items-center">
           {/* Logo and Description */}
