@@ -19,7 +19,7 @@ The system follows a simplified hierarchical structure:
 2. Users can view all available modules for their semester
 3. Each module contains student-created kuppi videos with embedded YouTube players
 
-## 🚀 Features
+## 🚀 Features 
 
 ### Core Functionality
 - **Simplified Selection**: Faculty → Department → Semester → Modules
