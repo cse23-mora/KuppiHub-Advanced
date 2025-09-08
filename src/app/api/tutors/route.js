@@ -3,18 +3,19 @@ import supabase from '../../../lib/supabase';
 export async function GET() {
   try {
     // Fetch all students with related info
-    const { data, error } = await supabase
-      .from('students')
-      .select(`
-        id,
-        index_no,
-        name,
-        image_url,
-        linkedin_url,
-        faculty:faculties(name),
-        department:departments(name),
-        videos:videos(id, title, module_id, modules(name))
-      `);
+ const { data, error } = await supabase
+  .from('students')
+  .select(`
+    id,
+    index_no,
+    name,
+    image_url,
+    linkedin_url,
+    faculty:faculties(name),
+    department:departments(name),
+    videos:videos(id, title, module_id, modules(name))
+  `)
+  .neq('name', 'Unknown');  // filter out students with name = 'Unknown'
 
     if (error) throw error;
 
