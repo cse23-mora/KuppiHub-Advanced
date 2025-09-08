@@ -12,12 +12,19 @@ interface Student {
   modules_done: string[];
 }
 
+
+const baseUrl =
+  process.env.VERCEL_URL // deployment URL in preview/prod
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000"; // fallback for local dev
+
+
 // This is a Server Component by default
 export default async function TutorsPage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tutors`, {
-    // fetch at build, not client
-    cache: "force-cache", 
-  });
+
+const res = await fetch(`${baseUrl}/api/tutors`, {
+  cache: "force-cache",
+});
 
   if (!res.ok) {
     throw new Error("Failed to fetch tutors");
