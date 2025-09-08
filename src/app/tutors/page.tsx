@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Preloader from "../components/Preloader";
+import Image from "next/image";
 interface Student {
   id: number;
   name: string;
@@ -25,9 +26,14 @@ export default function TutorsPage() {
         if (!res.ok) throw new Error("Failed to fetch tutors");
         const data = await res.json();
         setStudents(data.students);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
+      } catch (err: unknown) {
+  if (err instanceof Error) {
+    setError(err.message);
+  } else {
+    setError(String(err));
+  }
+}
+ finally {
         setLoading(false);
       }
     };
@@ -45,11 +51,14 @@ export default function TutorsPage() {
           key={student.id}
           className="border rounded-lg p-4 shadow hover:shadow-lg transition"
         >
-          <img
-            src={student.image_url || "/tutor.png"}
-            alt={student.name}
-            className="w-24 h-24 rounded-full mx-auto mb-4"
-          />
+         <div className="relative w-24 h-24 mx-auto mb-4">
+  <Image
+    src={student.image_url || "/tutor.png"}
+    alt={student.name}
+    fill
+    className="rounded-full object-cover"
+  />
+</div>
           <h2 className="text-xl font-bold text-center">{student.name}</h2>
           <p className="text-center text-gray-600">
             {student.faculty} - {student.department}

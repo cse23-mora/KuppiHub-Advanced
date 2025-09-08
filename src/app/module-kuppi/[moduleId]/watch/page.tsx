@@ -10,7 +10,7 @@ export default function WatchVideoPage() {
   let videoUrl = raw;
   try { videoUrl = decodeURIComponent(raw); } catch  { /* ignore */ }
 
-  //@ts-ignore
+// @ts-expect-error: moduleId may be undefined during prerender
   const getYouTubeVideoId = (input) => {
     if (!input) return null;
 
@@ -78,7 +78,8 @@ export default function WatchVideoPage() {
       ) : (
         <div className="text-center">
           <p className="text-red-600 mb-4">
-            Couldn 't extract a YouTube video ID from that URL.
+          Couldn&apos;t extract a YouTube video ID from that URL.
+
           </p>
           <div className="flex gap-2 justify-center">
             <a
