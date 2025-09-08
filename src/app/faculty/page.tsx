@@ -31,11 +31,11 @@ export default function FacultyPage() {
         setFaculties(data);
         setLoading(false);
       })
-      .catch(error => {
-        setError('Failed to load faculties');
-        setLoading(false);
-      });
-    } catch (err) {
+      // .catch(error => {
+      //   setError('Failed to load faculties');
+      //   setLoading(false);
+      // });
+    } catch{
       setError('Failed to load faculties');
       setLoading(false);
     }
