@@ -24,30 +24,30 @@ const geistMono = Geist_Mono({
 
 
 
-export const metadata = {
-  title: 'Kuppi Hub - Study Smarter, Together!',
-  description: 'Student-made tutorials to help you study smarter.',
-  keywords: 'study, student help, peer learning, tutorials, exam tips, student platform, education, Kuppi Hub',
-  openGraph: {
-    title: 'Kuppi Hub - Study Smarter, Together!',
-    description: 'A student-driven platform with peer-made resources to help you succeed in your studies.',
-    url: 'https://kuppihub.cse23.org',
-    type: 'website',
-    images: [
-      {
-        url: 'https://kuppihub.cse23.org/logo.png',
-        width: 100,
-        height: 100,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary',
-    title: 'Kuppi Hub - Study Smarter, Together!',
-    description: 'Peer tutorials and study help by students, for students.',
-    images: ['https://kuppihub.cse23.org/logo.png'],
-  },
-};
+// export const metadata = {
+//   title: 'Kuppi Hub - Study Smarter, Together!',
+//   description: 'Student-made tutorials to help you study smarter.',
+//   keywords: 'study, student help, peer learning, tutorials, exam tips, student platform, education, Kuppi Hub',
+//   openGraph: {
+//     title: 'Kuppi Hub - Study Smarter, Together!',
+//     description: 'A student-driven platform with peer-made resources to help you succeed in your studies.',
+//     url: 'https://kuppihub.cse23.org',
+//     type: 'website',
+//     images: [
+//       {
+//         url: 'https://kuppihub.cse23.org/logo.png',
+//         width: 100,
+//         height: 100,
+//       },
+//     ],
+//   },
+//   twitter: {
+//     card: 'summary',
+//     title: 'Kuppi Hub - Study Smarter, Together!',
+//     description: 'Peer tutorials and study help by students, for students.',
+//     images: ['https://kuppihub.cse23.org/logo.png'],
+//   },
+// };
 
 
 

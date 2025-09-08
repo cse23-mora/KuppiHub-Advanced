@@ -51,9 +51,9 @@ export default function Contact() {
         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">
           Contact Us
         </h2>
-        <p className="text-gray-600 mb-8 sm:mb-10 text-base sm:text-lg">
-          Got a question or feedback? We'd love to hear from you.
-        </p>
+       <p className="text-gray-600 mb-8 sm:mb-10 text-base sm:text-lg">
+  Got a question or feedback? We&apos;d love to hear from you.
+</p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           {/* Contact Form */}

@@ -30,7 +30,7 @@ interface VideoCardProps {
 }
 
 export default function VideoCard({ video, moduleId, isActive, onToggle }: VideoCardProps) {
-  const router = useRouter();
+
 
   return (
     <motion.div

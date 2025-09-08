@@ -36,7 +36,7 @@ export default function DepartmentPage() {
       const data = await response.json();
       setDepartments(data);
       setLoading(false);
-    } catch (err) {
+    } catch  {
       setError('Failed to load departments');
       setLoading(false);
     }
