@@ -1,8 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import Preloader from "../components/Preloader";
 import Image from "next/image";
+// import Preloader from "../components/Preloader";
+
 interface Student {
   id: number;
   name: string;
@@ -14,35 +12,19 @@ interface Student {
   modules_done: string[];
 }
 
-export default function TutorsPage() {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// This is a Server Component by default
+export default async function TutorsPage() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/tutors`, {
+    // fetch at build, not client
+    cache: "force-cache", 
+  });
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const res = await fetch("./api/tutors");
-        if (!res.ok) throw new Error("Failed to fetch tutors");
-        const data = await res.json();
-        setStudents(data.students);
-      } catch (err: unknown) {
-  if (err instanceof Error) {
-    setError(err.message);
-  } else {
-    setError(String(err));
+  if (!res.ok) {
+    throw new Error("Failed to fetch tutors");
   }
-}
- finally {
-        setLoading(false);
-      }
-    };
 
-    fetchStudents();
-  }, []);
-
-  if (loading) return <Preloader />;
-  if (error) return <p>Error: {error}</p>;
+  const data = await res.json();
+  const students: Student[] = data.students;
 
   return (
     <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -51,20 +33,21 @@ export default function TutorsPage() {
           key={student.id}
           className="border rounded-lg p-4 shadow hover:shadow-lg transition"
         >
-         <div className="relative w-24 h-24 mx-auto mb-4">
-  <Image
-    src={student.image_url || "/tutor.png"}
-    alt={student.name}
-    fill
-    className="rounded-full object-cover"
-  />
-</div>
+          <div className="relative w-24 h-24 mx-auto mb-4">
+            <Image
+              src={student.image_url || "/tutor.png"}
+              alt={student.name}
+              fill
+              className="rounded-full object-cover"
+            />
+          </div>
           <h2 className="text-xl font-bold text-center">{student.name}</h2>
           <p className="text-center text-gray-600">
             {student.faculty} - {student.department}
           </p>
-          <p className="text-center mt-2">Done: {student.video_count} Kuppis</p>
-
+          <p className="text-center mt-2">
+            Done: {student.video_count} Kuppis
+          </p>
           {student.modules_done.length > 0 && (
             <ul className="mt-2 list-disc list-inside text-sm">
               {student.modules_done.map((module, idx) => (
@@ -72,7 +55,6 @@ export default function TutorsPage() {
               ))}
             </ul>
           )}
-
           {student.linkedin_url && (
             <div className="text-center mt-4">
               <a
@@ -90,3 +72,6 @@ export default function TutorsPage() {
     </div>
   );
 }
+
+// Optional: fully static (never re-fetch)
+export const revalidate = false;
