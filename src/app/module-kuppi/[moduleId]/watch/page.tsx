@@ -10,7 +10,7 @@ export default function WatchVideoPage() {
   let videoUrl = raw;
   try { videoUrl = decodeURIComponent(raw); } catch  { /* ignore */ }
 
-  //@ts-expect-error
+// @ts-expect-error: moduleId may be undefined during prerender
   const getYouTubeVideoId = (input) => {
     if (!input) return null;
 
