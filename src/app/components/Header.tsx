@@ -66,6 +66,14 @@ export default function Header() {
             >
               About
             </Link>
+               <Link 
+              href="/add-kuppi" 
+              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
+                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
+                         transition-all duration-500 ease-in-out transform hover:scale-105"
+            >
+              Add Kuppi
+            </Link>
           </div>
 
           {/* Placeholder for search (can be added later) */}
@@ -103,7 +111,7 @@ export default function Header() {
         >
           
           <div className="p-4 space-y-4 transition-opacity duration-500">
-            {['Home', 'Semesters', 'Tutors', 'About'].map((item, i) => (
+            {['Home', 'Semesters', 'Tutors', 'About', 'Add-Kuppi'].map((item, i) => (
               <Link
                 key={i}
                 href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
