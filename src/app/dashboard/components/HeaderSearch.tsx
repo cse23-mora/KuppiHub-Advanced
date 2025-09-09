@@ -72,15 +72,19 @@ export default function HeaderSearch() {
                   </p>
                   <p className="text-gray-600 text-sm mb-2">{video.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {video.youtube_links.map((url, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleWatch(url)}
-                        className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition"
-                      >
-                        Watch Video {idx + 1}
-                      </button>
-                    ))}
+                  <div className="flex flex-wrap gap-2">
+      {video.youtube_links && video.youtube_links.length > 0 && (
+        video.youtube_links.map((url, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleWatch(url)}
+            className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition"
+          >
+            Watch Video {idx + 1}
+          </button>
+        ))
+      )}
+    </div>
                     {video.telegram_links?.map((link, idx) => (
                       <a
                         key={idx}
