@@ -29,9 +29,7 @@ curl -L -X POST 'https://basked urlt' \
         "index_no": "230312J",
         "name": "Teshan Kannangara",
         "faculty": "Engineering",
-        "department": "Computer Science",
         "batch": 2023,
-        "semester": "Semester 1",
         "image_url": "https://eczksamd.sds.s",
         "linkedin_url": "https://dds.sd"
       }'

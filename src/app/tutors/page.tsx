@@ -65,12 +65,18 @@ export default function StudentsPage() {
               className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition duration-300"
             >
               <div className="relative aspect-square w-full overflow-hidden">
-                <Image
-                  src={student.image_url || "/tutor.png"}
-                  alt={student.name}
-                  fill
-                  className="object-cover rounded-full"
-                />
+<Image
+  src={
+    student.image_url
+      ? decodeURIComponent(student.image_url) // fix double encoding
+      : "/tutor.png" // fallback if null
+  }
+  alt={student.name}
+  fill
+  className="object-cover rounded-full"
+/>
+
+
               </div>
 
               <div className="p-4">
