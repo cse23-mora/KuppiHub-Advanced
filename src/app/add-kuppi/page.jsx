@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 export default function AddKuppi() {
   const formUrls = {
     addKuppi: 'https://docs.google.com/forms/d/e/1FAIpQLSezyJsO9tl37tzieXLGzohTf3Oc9mJ3lCaihWG6KzP5RvzAyA/viewform?usp=header?hl=en',
-    studentKuppi: 'https://docs.google.com/forms/d/e/1FAIpQLSdEwUJ5dGwtjryLkOHoX27Vhal0zTvxoLbQ9Q1KcR7W_q3dlg/viewform?hl=en',
+    studentKuppi: 'https://docs.google.com/forms/d/e/1FAIpQLSfkTsf7vIfXBM_NXEjxqq07S3Cq1NVZC_coTIBz-2hxP_mF3w/viewform?hl=en',
   };
 
   const fadeUp = {
