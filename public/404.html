@@ -1,33 +1,570 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Page Not Found</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Segmentation Fault in Reality</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px 16px; border-radius: 3px; }
-      #message h3 { color: #888; font-weight: normal; font-size: 16px; margin: 16px 0 12px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
+        body {
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            overflow-x: hidden;
+            min-height: 100vh;
+            color: #00ff41;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            pointer-events: none;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 14px;
+            color: #00ff41;
+        }
+
+        .matrix-column {
+            position: absolute;
+            white-space: pre;
+            animation: matrix-fall linear infinite;
+        }
+
+        @keyframes matrix-fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        #threejs-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .error-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .error-404 {
+            font-size: 8rem;
+            font-weight: 700;
+            color: #ff6b6b;
+            text-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b;
+            animation: glitch 2s infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, 2px); }
+            20% { transform: translate(2px, -2px); }
+            30% { transform: translate(-2px, -2px); }
+            40% { transform: translate(2px, 2px); }
+            50% { transform: translate(-2px, 2px); }
+            60% { transform: translate(2px, -2px); }
+            70% { transform: translate(-2px, -2px); }
+            80% { transform: translate(2px, 2px); }
+        }
+
+        .error-subtitle {
+            font-size: 1.5rem;
+            color: #ffd93d;
+            margin-bottom: 2rem;
+            animation: typewriter 4s steps(40) infinite;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #ffd93d;
+        }
+
+        @keyframes typewriter {
+            0% { width: 0; }
+            50% { width: 100%; }
+            100% { width: 0; }
+        }
+
+        .code-block {
+            background: rgba(15, 15, 35, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 600px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            animation: codeGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes codeGlow {
+            0% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); }
+            100% { box-shadow: 0 0 50px rgba(0, 255, 65, 0.6); }
+        }
+
+        .code-line {
+            color: #00ff41;
+            margin: 5px 0;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .code-line.error { color: #ff6b6b; }
+        .code-line.warning { color: #ffd93d; }
+        .code-line.comment { color: #6272a4; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .funny-messages {
+            text-align: center;
+            margin: 2rem 0;
+            max-width: 700px;
+        }
+
+        .funny-message {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 217, 61, 0.1));
+            border-left: 4px solid #6c5ce7;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .floating-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .icon {
+            position: absolute;
+            font-size: 2rem;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        .icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .icon:nth-child(2) { top: 20%; right: 15%; animation-delay: -1s; }
+        .icon:nth-child(3) { bottom: 30%; left: 20%; animation-delay: -2s; }
+        .icon:nth-child(4) { bottom: 15%; right: 10%; animation-delay: -3s; }
+        .icon:nth-child(5) { top: 60%; left: 5%; animation-delay: -4s; }
+        .icon:nth-child(6) { top: 40%; right: 5%; animation-delay: -5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .home-button {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+            font-weight: 500;
+        }
+
+        .home-button::before {
+            content: '> ';
+        }
+
+        .home-button::after {
+            content: ' <';
+        }
+
+        .home-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(108, 92, 231, 0.5);
+            background: linear-gradient(45deg, #5f27cd, #00d2d3);
+        }
+
+        .console-window {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+        }
+
+        .console-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .console-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .console-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+
+        .console-title {
+            margin-left: 15px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .console-content {
+            color: #00ff41;
+            line-height: 1.5;
+        }
+
+        .batch-badge {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        .loading-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            border-radius: 10px;
+            animation: loading 3s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .error-404 { font-size: 6rem; }
+            .error-subtitle { font-size: 1.2rem; }
+            .code-block, .console-window { max-width: 90%; }
+            .icon { font-size: 1.5rem; }
+        }
     </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>404</h2>
-      <h1>Page Not Found</h1>
-      <p>The specified file was not found on this website. Please check the URL for mistakes and try again.</p>
-      <h3>Why am I seeing this?</h3>
-      <p>This page was generated by the Firebase Command-Line Interface. To modify it, edit the <code>404.html</code> file in your project's configured <code>public</code> directory.</p>
+</head>
+<body>
+    <!-- Matrix background -->
+    <div class="matrix-bg" id="matrix"></div>
+    
+    <!-- Three.js 3D container -->
+    <div id="threejs-container"></div>
+
+    <!-- Floating CS icons -->
+    <div class="floating-icons">
+        <div class="icon">💻</div>
+        <div class="icon">🖥️</div>
+        <div class="icon">⚡</div>
+        <div class="icon">🔧</div>
+        <div class="icon">📱</div>
+        <div class="icon">🚀</div>
     </div>
-  </body>
+
+    <div class="container">
+        <div class="error-header">
+            <div class="error-404">404</div>
+            <div class="error-subtitle">Segmentation fault: Page not found in memory</div>
+            <!-- <div class="batch-badge">CSE Batch 23 🎓</div> -->
+        </div>
+
+        <div class="console-window">
+            <div class="console-header">
+                <div class="console-buttons">
+                    <div class="console-button close"></div>
+                    <div class="console-button minimize"></div>
+                    <div class="console-button maximize"></div>
+                </div>
+                <div class="console-title">student@batch23:~/life/reality$</div>
+            </div>
+            <div class="console-content">
+                <div class="code-line">$ find /internet -name "page.html"</div>
+                <div class="code-line error">find: '/internet': No such file or directory</div>
+                <div class="code-line">$ sudo apt install reality-patch</div>
+                <div class="code-line warning">WARNING: Package 'reality-patch' not found</div>
+                <div class="code-line comment"># Looks like we need to debug this manually...</div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            <div class="code-line comment">// CSE Batch 23 Error Handler</div>
+            <div class="code-line">if (page.found()) {</div>
+            <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;displayPage();</div>
+            <div class="code-line">} else {</div>
+            <div class="code-line error">&nbsp;&nbsp;&nbsp;&nbsp;throw new LifeException("404: Page yeeted into void");</div>
+            <div class="code-line">}</div>
+            <div class="code-line comment">// TODO: Fix this before assignment deadline 😅</div>
+        </div>
+
+        <div class="funny-messages">
+            <div class="funny-message">
+                <h3>🤓 Debug Info:</h3>
+                <p>Error: Page not found. Did you forget to push your commits again? Classic Batch 23 move!</p>
+            </div>
+            
+            <div class="funny-message">
+                <h3>🐛 Bug Report:</h3>
+                <p>Status: It's not a bug, it's a feature! (Just like our code in 3AM lab sessions)</p>
+            </div>
+            
+            <div class="funny-message">
+                <h3>💭 Possible Solutions:</h3>
+                <p>1. Try turning it off and on again<br>
+                2. Clear your browser cache (and your semester doubts)<br>
+                3. Blame it on the network (works 60% of the time, every time)</p>
+            </div>
+
+            <div class="funny-message">
+                <h3>🎯 CSE Batch 23 Wisdom:</h3>
+                <p>"There are only 10 types of people: those who understand binary and those who don't. 
+                Unfortunately, this page belongs to the third type."</p>
+            </div>
+        </div>
+
+        <div class="loading-bar">
+            <div class="loading-fill"></div>
+        </div>
+        <p style="text-align: center; color: #6272a4; margin-top: 10px;">
+            Loading alternative reality... Please wait while we compile your dreams 🔄
+        </p>
+
+        <button class="home-button" onclick="goHome()">
+            return home();
+        </button>
+    </div>
+
+    <script>
+        // Matrix rain effect
+        function createMatrix() {
+            const matrix = document.getElementById('matrix');
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{}[]();/\\<>?:|`~!@#$%^&*_+=';
+            const columns = Math.floor(window.innerWidth / 14);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = i * 14 + 'px';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let text = '';
+                for (let j = 0; j < 50; j++) {
+                    text += chars.charAt(Math.floor(Math.random() * chars.length)) + '\n';
+                }
+                column.textContent = text;
+                matrix.appendChild(column);
+            }
+        }
+
+        // Three.js setup
+        function initThreeJS() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.getElementById('threejs-container').appendChild(renderer.domElement);
+
+            // Create floating cubes (representing data blocks)
+            const cubes = [];
+            for (let i = 0; i < 20; i++) {
+                const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+                const material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.7, 0.5),
+                    wireframe: true
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                
+                cube.position.x = (Math.random() - 0.5) * 20;
+                cube.position.y = (Math.random() - 0.5) * 20;
+                cube.position.z = (Math.random() - 0.5) * 20;
+                
+                scene.add(cube);
+                cubes.push(cube);
+            }
+
+            camera.position.z = 5;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                cubes.forEach(cube => {
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+                    cube.position.y += Math.sin(Date.now() * 0.001 + cube.position.x) * 0.01;
+                });
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // Go home function with animation
+        function goHome() {
+            const button = document.querySelector('.home-button');
+            const container = document.querySelector('.container');
+            
+            // Add some CS humor
+            const funnyMessages = [
+                'Executing return statement...',
+                'Deallocating memory...',
+                'Closing all brackets...',
+                'Committing changes to reality...',
+                'Pushing to main branch of life...'
+            ];
+            
+            button.textContent = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+            
+            container.style.transition = 'transform 1s ease-in-out, opacity 1s ease-in-out';
+            container.style.transform = 'scale(0.1) rotateY(180deg)';
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.history.back() || (window.location.href = '/');
+            }, 1000);
+        }
+
+        // Easter eggs and interactions
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'c' && e.ctrlKey) {
+                const jokes = [
+                    'Ctrl+C detected! But you can\'t copy-paste your way out of this error! 😄',
+                    'Nice try! But StackOverflow is down in this dimension.',
+                    'Error 418: I\'m a teapot (and you\'re trying to copy-paste again)',
+                    'Ctrl+C won\'t work here. Try Ctrl+Alt+Delete your life choices instead! 😅'
+                ];
+                alert(jokes[Math.floor(Math.random() * jokes.length)]);
+                e.preventDefault();
+            }
+            
+            if (e.key === 'F12') {
+                alert('Inspecting element? Found any bugs in reality? Let us know! - CSE Batch 23 Debug Team');
+            }
+        });
+
+        // Konami code easter egg
+        let konamiCode = [];
+        const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.code);
+            if (konamiCode.length > konami.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konami)) {
+                document.body.style.filter = 'hue-rotate(180deg) saturate(2)';
+                alert('🎉 Cheat code activated! Welcome to the Matrix, Neo... I mean, CSE student!');
+                konamiCode = [];
+            }
+        });
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrix();
+            initThreeJS();
+            
+            // Add typing animation to code blocks
+            const codeLines = document.querySelectorAll('.code-line');
+            codeLines.forEach((line, index) => {
+                line.style.animationDelay = (index * 0.2) + 's';
+            });
+            
+            // Random tech facts tooltip
+            const icons = document.querySelectorAll('.icon');
+            const techFacts = [
+                'The first computer bug was an actual bug found in 1947!',
+                'There are more possible games of chess than atoms in the observable universe',
+                'The term "debugging" was coined by Grace Hopper',
+                'Python is named after Monty Python\'s Flying Circus',
+                'The first computer was the size of a room!',
+                'JavaScript was created in just 10 days'
+            ];
+            
+            icons.forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const fact = techFacts[Math.floor(Math.random() * techFacts.length)];
+                    alert(`💡 Tech Fact: ${fact}`);
+                });
+            });
+        });
+    </script>
+</body>
 </html>
