@@ -10,7 +10,8 @@ const fadeUp = {
 
 const FAQ = () => {
   const [loading, setLoading] = useState(true);
-  const [openFAQ, setOpenFAQ] = useState(null);
+ const [openFAQ, setOpenFAQ] = useState<string | null>(null);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -156,10 +157,10 @@ const FAQ = () => {
 ];
 
 
-  const toggleFAQ = (categoryIndex, faqIndex) => {
-    const id = `${categoryIndex}-${faqIndex}`;
-    setOpenFAQ(openFAQ === id ? null : id);
-  };
+const toggleFAQ = (categoryIndex: number, faqIndex: number) => {
+  const id = `${categoryIndex}-${faqIndex}`;
+  setOpenFAQ(openFAQ === id ? null : id);
+};
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
