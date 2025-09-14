@@ -64,7 +64,9 @@ return (
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           Welcome to KuppiHub
         </h1>
-       
+                 <p className="text-xl text-gray-600">
+            Select your faculty to get started
+          </p>
 
         {/* New description */}
     <h2 className="hidden  text-md text-gray-700 max-w-2xl mx-auto">
