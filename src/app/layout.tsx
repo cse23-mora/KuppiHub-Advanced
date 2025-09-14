@@ -28,11 +28,11 @@ export const metadata: Metadata = {
     title: "Kuppi Hub - Study Smarter, Together!",
     description:
       "A student-driven platform with peer-made resources to help you succeed in your studies.",
-    url: "https://kuppihub.cse23.org",
+    url: "https://kuppihub.org",
     type: "website",
     images: [
       {
-        url: "https://kuppihub.cse23.org/logo.png",
+        url: "https://kuppihub.org/logo.png",
         width: 100,
         height: 100,
       },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Kuppi Hub - Study Smarter, Together!",
     description: "Peer tutorials and study help by students, for students.",
-    images: ["https://kuppihub.cse23.org/logo.png"],
+    images: ["https://kuppihub.org/logo.png"],
   },
   verification: {
     google: "CfPv_Tyr1nJGEgYQxK5uqYdknw8_mae6_weHZtm3K20",
