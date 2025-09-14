@@ -130,20 +130,18 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
                 `/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(url)}`
               )
             }
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-red-500 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Watch Video {video.youtube_links.length > 1 ? index + 1 : ""}
+         <svg
+  className="w-5 h-5 mr-2"
+  fill="currentColor"
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+>
+  <path d="M23.498 6.186a2.974 2.974 0 0 0-2.094-2.103C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.404.583a2.974 2.974 0 0 0-2.094 2.103C0 8.09 0 12 0 12s0 3.91.502 5.814a2.974 2.974 0 0 0 2.094 2.103C4.495 20.5 12 20.5 12 20.5s7.505 0 9.404-.583a2.974 2.974 0 0 0 2.094-2.103C24 15.91 24 12 24 12s0-3.91-.502-5.814zM9.75 15.568V8.432L15.818 12 9.75 15.568z" />
+</svg>
+
+            Watch Video From Youtube{video.youtube_links.length > 1 ? index + 1 : ""}
           </motion.button>
         ))}
 
@@ -158,14 +156,16 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
               rel="noopener noreferrer"
               className="flex-grow flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-xl text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
             >
-              <svg
-                className="w-4 h-4 mr-1.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-              </svg>
-              Telegram {video.telegram_links!.length > 1 ? index + 1 : ""}
+           <svg
+  className="w-6 h-6 mr-1.5"
+  fill="currentColor"
+  viewBox="0 0 25 25"
+  aria-hidden="true"
+>
+  <path d="M9.999 15.2 9.85 19c.35 0 .5-.15.7-.35l1.65-1.6 3.45 2.55c.65.35 1.1.15 1.25-.6l2.25-10.6c.2-.9-.35-1.25-.95-1.05L4.4 10.35c-.9.35-.85.85-.15 1.05l3.2 1 7.4-4.65c.35-.2.65-.1.4.15l-5.8 5.3Z" />
+</svg>
+
+              Download Video From Telegram {video.telegram_links!.length > 1 ? index + 1 : ""}
             </motion.a>
           ))}
 
@@ -190,7 +190,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
                   clipRule="evenodd"
                 ></path>
               </svg>
-              Material {video.material_urls!.length > 1 ? index + 1 : ""}
+              Material (PDF){video.material_urls!.length > 1 ? index + 1 : ""}
             </motion.a>
           ))}
         </div>
