@@ -1,64 +1,62 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-		<!--	created with www.mysitemapgenerator.com	-->
-		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
 <url>
-	<loc>https://kuppihub.cse23.org/</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>1.00</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/image</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/tutors</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/semesters</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/about</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/Tutors</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/add-kuppi</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.90</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/about</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/contact</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/Home</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/faq</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.90</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/subjects</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/features</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.80</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/contact</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/features</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.90</priority>
 </url>
 <url>
-	<loc>https://kuppihub.cse23.org/sem3</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/department?faculty=1</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.70</priority>
 </url>
+
 <url>
-	<loc>https://kuppihub.cse23.org/sem2</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
+  <loc>https://kuppihub.org/module-kuppi/34</loc>
+  <lastmod>2025-09-14T03:32:33+00:00</lastmod>
+  <priority>0.60</priority>
 </url>
-<url>
-	<loc>https://kuppihub.cse23.org/search</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
-</url>
-<url>
-	<loc>https://kuppihub.cse23.org/404NotFound</loc>
-	<lastmod>2025-08-14T20:16:46+01:00</lastmod>
-	<priority>1.0</priority>
-</url>
+
 </urlset>
