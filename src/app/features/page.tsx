@@ -30,31 +30,32 @@ const Features = () => {
   if (loading) return <Preloader />;
 
   const coreFeatures = [
-    {
-      icon: "🎓",
-      title: "Complete University Coverage",
-      description: "All faculties covered - Engineering, Medicine, Business, Architecture, IT, and beyond! Every department, every semester, every module.",
-      highlight: "100% Free Access"
-    },
-    {
-      icon: "🌍",
-      title: "Multilingual Support",
-      description: "Learn in your comfort zone! Content available in Sinhala, Tamil, and English - because knowledge shouldn't have language barriers.",
-      highlight: "Three Languages"
-    },
-    {
-      icon: "📱",
-      title: "Access Anywhere",
-      description: "Web platform, mobile app (APK available), and GitHub repository - study on your phone, laptop, or contribute to the codebase!",
-      highlight: "Cross-Platform"
-    },
-    {
-      icon: "🔓",
-      title: "No Barriers Entry",
-      description: "No login required, no paywalls, no premium accounts. Just pure, accessible education for every Sri Lankan student.",
-      highlight: "Open Access"
-    }
-  ];
+  {
+    icon: "🎓",
+    title: "Complete University Coverage",
+    description: "All faculties covered - Engineering, Medicine, Business, Architecture, IT, and beyond! Every department, every semester, every module.",
+    highlight: "100% Free Access"
+  },
+  {
+    icon: "🌍",
+    title: "Multilingual Support",
+    description: "Learn in your comfort zone! Content available in Sinhala, Tamil, and English - because knowledge shouldn&apos;t have language barriers.",
+    highlight: "Three Languages"
+  },
+  {
+    icon: "📱",
+    title: "Access Anywhere",
+    description: "Web platform, mobile app (APK available), and GitHub repository - study on your phone, laptop, or contribute to the codebase!",
+    highlight: "Cross-Platform"
+  },
+  {
+    icon: "🔓",
+    title: "No Barriers Entry",
+    description: "No login required, no paywalls, no premium accounts. Just pure, accessible education for every Sri Lankan student.",
+    highlight: "Open Access"
+  }
+];
+
 
   const contentTypes = [
     {
