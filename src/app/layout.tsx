@@ -66,8 +66,22 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4338559761379667"
-     crossOrigin="anonymous"></script>
+         
+
+<Script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=G-68J1S4VW95"
+  strategy="afterInteractive"
+/>
+<Script id="gtag-G-68J1S4VW95" strategy="afterInteractive">
+{`
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-68J1S4VW95');
+`}
+</Script>
+
       </head>
 
       <body
