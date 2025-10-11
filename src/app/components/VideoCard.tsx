@@ -83,7 +83,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
       className="px-6 pb-6 border-t border-blue-100"
     >
       {video.description && (
-        <p className="text-gray-600 mt-4 mb-4 text-sm">
+        <p className="text-gray-600 mt-4 mb-4 text-sm whitespace-pre-line">
           {video.description}
         </p>
       )}
