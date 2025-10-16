@@ -7,6 +7,7 @@ import "./globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import NotificationSnackbar from "./components/NotificationSnackbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -95,6 +96,7 @@ export default function RootLayout({
 
         <Footer />
         <ScrollToTopButton />
+        <NotificationSnackbar />
 
         {/* ✅ Google AdSense */}
         <Script
