@@ -46,6 +46,7 @@ export default function VideoCard({ video, moduleId, isActive, onToggle }: Video
         className="w-full text-left p-6 flex justify-between items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
       >
         <div className="flex items-center">
+          
           <h2 className="text-lg font-semibold text-gray-800">{video.title}</h2>
           {video.is_kuppi && (
             <span className="ml-3 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
