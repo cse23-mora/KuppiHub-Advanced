@@ -31,7 +31,7 @@ export default function NotificationSnackbar() {
         </Button>
       }
     >
-      23 Batch Electrical Department's Kuppies added.
+      23rd Batch Electrical Dept. Kuppies added.
     </Snackbar>
   );
 }
