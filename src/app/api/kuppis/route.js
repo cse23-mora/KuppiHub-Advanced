@@ -18,6 +18,7 @@ export async function GET(req) {
         youtube_links,
         telegram_links,
         material_urls,
+        cloud_video_urls,
         is_kuppi,
         description,
         language_code,

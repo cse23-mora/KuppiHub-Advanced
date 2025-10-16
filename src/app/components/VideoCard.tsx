@@ -10,6 +10,7 @@ interface Video {
   youtube_links: string[];
   telegram_links?: string[];
   material_urls?: string[];
+  cloud_video_urls?: string[];
   is_kuppi?: boolean;
   description?: string;
   language_code?: string;
@@ -168,6 +169,27 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
               Download Video From Telegram {video.telegram_links!.length > 1 ? index + 1 : ""}
             </motion.a>
           ))}
+
+
+
+            {video.cloud_video_urls?.map((link, index) => (
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              key={`cloud-${index}`}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+        >
+              <img
+              src="/images/icons/onedrive.png"
+              className=" h-5 mr-2"
+              alt="OneDrive"
+              />
+              OneDrive Video {video.cloud_video_urls!.length > 1 ? index + 1 : ""}
+            </motion.a>
+            ))}
 
           {video.material_urls?.map((link, index) => (
             <motion.a
