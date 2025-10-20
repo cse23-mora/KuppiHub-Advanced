@@ -18,28 +18,20 @@ export default function FacultyPage() {
     fetchFaculties();
   }, []);
 
-  const fetchFaculties = async () => {
-    try {
-      fetch ('./api/faculties', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        setFaculties(data);
-        setLoading(false);
-      })
-      // .catch(error => {
-      //   setError('Failed to load faculties');
-      //   setLoading(false);
-      // });
-    } catch{
-      setError('Failed to load faculties');
-      setLoading(false);
-    }
-  };
+const fetchFaculties = async () => {
+  try {
+    const response = await fetch('/api/faculties');
+    if (!response.ok) throw new Error('Failed to fetch faculties');
+
+    const data = await response.json();
+    setFaculties(data);
+  } catch {
+    setError('Failed to load faculties');
+  } finally {
+    setLoading(false);
+  }
+};
+
      
   const handleFacultySelect = (facultyId: number) => {
     // Store selection in localStorage or state management
