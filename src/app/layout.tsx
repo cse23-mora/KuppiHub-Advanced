@@ -96,7 +96,8 @@ export default function RootLayout({
 
         <Footer />
         <ScrollToTopButton />
-        <NotificationSnackbar />
+        
+        {/* <NotificationSnackbar /> */}
 
         {/* ✅ Google AdSense */}
         <Script
