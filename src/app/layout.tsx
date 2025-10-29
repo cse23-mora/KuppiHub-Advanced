@@ -27,8 +27,7 @@ export const metadata: Metadata = {
     "study, student help, peer learning, tutorials, exam tips, student platform, education, Kuppi Hub",
   openGraph: {
     title: "Kuppi Hub - Study Smarter, Together!",
-    description:
-      "A student-driven platform with peer-made resources to help you succeed in your studies.",
+    description: "A student-driven study platform by University of Moratuwa students to learn, share, and grow together.",
     url: "https://kuppihub.org",
     type: "website",
     images: [
