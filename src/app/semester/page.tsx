@@ -124,10 +124,7 @@ export default function SemesterPage() {
                   <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
                     {semester.name}
                   </h3>
-                  
-                  <p className="text-sm text-gray-600 mb-4">
-                    Click to select this semester
-                  </p>
+            
                   
                   <div className="flex justify-center items-center">
                     <span className="text-blue-600 font-medium group-hover:text-indigo-700 transition-colors duration-300">
