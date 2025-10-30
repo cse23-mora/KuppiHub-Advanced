@@ -12,6 +12,7 @@ interface ModuleData {
   faculty: { name: string };
   department: { name: string };
   semester: { name: string };
+  video_count?: number;
 }
 
 export default function ModulesPage() {
@@ -227,19 +228,20 @@ export default function ModulesPage() {
                   <p className="text-gray-600 text-sm line-clamp-2 mb-4">{mod.module.description}</p>
 
                   <div className="mt-4 text-xs text-gray-500 space-y-1">
-                    <p className="flex items-center">Faculty: {mod.faculty.name}</p>
-                    <p className="flex items-center">Department: {mod.department.name}</p>
-                    <p className="flex items-center">Semester: {mod.semester.name}</p>
+                  <p className="flex items-center text-blue-600 font-semibold mt-2">
+                {mod.video_count || 0} video{mod.video_count !== 1 ? 's' : ''} available
+                  </p>
+                    
                   </div>
 
-                  <div className="mt-6 flex justify-end">
+                  {/* <div className="mt-6 flex justify-end">
                     <span className="text-blue-600 font-medium group-hover:text-indigo-700 transition-colors duration-300 flex items-center">
                       View Module
                       <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             ))}
