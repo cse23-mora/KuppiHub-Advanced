@@ -66,8 +66,8 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
         videoElement.className = 'video-js vjs-default-skin vjs-big-play-centered';
         videoElement.setAttribute('controls', '');
         videoElement.setAttribute('preload', 'auto');
-        videoElement.setAttribute('width', '640');
-        videoElement.setAttribute('height', '360');
+        videoElement.setAttribute('width', '480');
+        videoElement.setAttribute('height', '270');
 
         // Clear container and add video element
         if (containerRef.current) {
@@ -86,7 +86,7 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
           preload: 'auto',
           responsive: true,
           fluid: true,
-          playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+          playbackRates: [ 1, 1.25, 1.5, 1.75, 2],
         };
 
         if (youtubeId) {
@@ -157,7 +157,7 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
           <h1 className="text-2xl font-bold text-gray-800 mb-4">{videoTitle}</h1>
         )}
         
-        <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto' }}>
           <div ref={containerRef} style={{ aspectRatio: '16/9' }} />
         </div>
       </div>
