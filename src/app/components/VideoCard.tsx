@@ -129,7 +129,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
             key={`url-${index}`}
             onClick={() =>
               router.push(
-                `/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(url)}`
+                `/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(url)}&videoTitle=${encodeURIComponent(video.title)}`
               )
             }
             className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-red-500 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
