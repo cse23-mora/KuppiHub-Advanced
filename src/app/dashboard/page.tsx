@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import HeaderSearch from "../components/HeaderSearch";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ModuleData {
   module_id: number;
@@ -17,37 +18,137 @@ interface ModuleData {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [modules, setModules] = useState<ModuleData[] | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  // Sync modules to Supabase (for logged-in users)
+  const syncToCloud = useCallback(async (moduleData: ModuleData[]) => {
+    if (!user?.email) return;
+    
+    try {
+      const moduleIds = moduleData.map(m => m.module_id);
+      await fetch('/api/user-dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, moduleIds }),
+      });
+    } catch (err) {
+      console.error('Failed to sync to cloud:', err);
+    }
+  }, [user?.email]);
+
+  // Load modules from cloud (for logged-in users)
+  const loadFromCloud = useCallback(async () => {
+    if (!user?.email) return null;
+    
+    try {
+      setSyncing(true);
+      const res = await fetch(`/api/user-dashboard?email=${encodeURIComponent(user.email)}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.moduleIds || [];
+    } catch (err) {
+      console.error('Failed to load from cloud:', err);
+      return null;
+    } finally {
+      setSyncing(false);
+    }
+  }, [user?.email]);
 
   // Load modules from localStorage
-  const loadModules = () => {
+  const loadModulesFromLocal = useCallback(() => {
     try {
       const raw = localStorage.getItem("dashboardModules");
       const parsed: ModuleData[] = raw ? JSON.parse(raw) : [];
-      setModules(parsed);
       return parsed;
     } catch (err) {
       console.error("Failed to read dashboard modules", err);
-      setModules([]);
       return [];
     }
-  };
+  }, []);
 
-  // Load modules on mount and listen for updates
+  // Save modules to localStorage
+  const saveModulesToLocal = useCallback((moduleData: ModuleData[]) => {
+    localStorage.setItem("dashboardModules", JSON.stringify(moduleData));
+  }, []);
+
+  // Fetch fresh module data from API
+  const fetchModuleDetails = useCallback(async (moduleIds: number[]) => {
+    if (moduleIds.length === 0) return [];
+    
+    try {
+      const res = await fetch(`/api/dashboard-modules?ids=${moduleIds.join(",")}`);
+      if (!res.ok) return [];
+      return await res.json();
+    } catch (err) {
+      console.error("Failed to fetch module details", err);
+      return [];
+    }
+  }, []);
+
+  // Main load effect
+  useEffect(() => {
+    if (typeof window === "undefined" || authLoading) return;
+
+    const initializeModules = async () => {
+      const localModules = loadModulesFromLocal();
+      
+      if (user?.email) {
+        // User is logged in - check cloud storage
+        const cloudModuleIds = await loadFromCloud();
+        
+        if (cloudModuleIds && cloudModuleIds.length > 0) {
+          // Merge local and cloud (cloud takes priority for IDs that exist in both)
+          const localIds = new Set(localModules.map(m => m.module_id));
+          const cloudIds = new Set(cloudModuleIds);
+          
+          // Get all unique IDs
+          const allIds = Array.from(new Set([...localIds, ...cloudIds]));
+          
+          // Fetch fresh data for all modules
+          const freshModules = await fetchModuleDetails(allIds as number[]);
+          
+          if (freshModules.length > 0) {
+            setModules(freshModules);
+            saveModulesToLocal(freshModules);
+            await syncToCloud(freshModules);
+          } else {
+            // Fallback to local if API fails
+            setModules(localModules);
+          }
+        } else if (localModules.length > 0) {
+          // No cloud data but local data exists - sync local to cloud
+          setModules(localModules);
+          await syncToCloud(localModules);
+        } else {
+          setModules([]);
+        }
+      } else {
+        // Not logged in - use local only
+        setModules(localModules);
+        if (localModules.length > 0) {
+          refreshModuleCounts(localModules);
+        }
+      }
+    };
+
+    initializeModules();
+  }, [user, authLoading, loadFromCloud, loadModulesFromLocal, fetchModuleDetails, saveModulesToLocal, syncToCloud]);
+
+  // Listen for updates from HeaderSearch
   useEffect(() => {
     if (typeof window === "undefined") return;
     
-    const parsed = loadModules();
-    
-    // Optionally refresh video counts from API
-    if (parsed.length > 0) {
-      refreshModuleCounts(parsed);
-    }
-    
-    // Listen for updates from HeaderSearch
-    const handleUpdate = () => {
-      loadModules();
+    const handleUpdate = async () => {
+      const parsed = loadModulesFromLocal();
+      setModules(parsed);
+      
+      // Sync to cloud if logged in
+      if (user?.email && parsed.length > 0) {
+        await syncToCloud(parsed);
+      }
     };
     
     window.addEventListener("dashboardModulesUpdated", handleUpdate);
@@ -55,7 +156,7 @@ export default function DashboardPage() {
     return () => {
       window.removeEventListener("dashboardModulesUpdated", handleUpdate);
     };
-  }, []);
+  }, [user?.email, loadModulesFromLocal, syncToCloud]);
 
   // Fetch fresh video counts for dashboard modules
   const refreshModuleCounts = async (currentModules: ModuleData[]) => {
@@ -74,7 +175,7 @@ export default function DashboardPage() {
       );
 
       setModules(updated);
-      localStorage.setItem("dashboardModules", JSON.stringify(updated));
+      saveModulesToLocal(updated);
     } catch (err) {
       console.error("Failed to refresh module counts", err);
     }
@@ -85,13 +186,18 @@ export default function DashboardPage() {
     router.push(`/module-kuppi/${moduleId}`);
   };
 
-  const handleRemoveModule = (e: React.MouseEvent, moduleId: number) => {
+  const handleRemoveModule = async (e: React.MouseEvent, moduleId: number) => {
     e.stopPropagation();
     if (!modules) return;
 
     const updated = modules.filter((m) => m.module_id !== moduleId);
     setModules(updated);
-    localStorage.setItem("dashboardModules", JSON.stringify(updated));
+    saveModulesToLocal(updated);
+    
+    // Sync to cloud if logged in
+    if (user?.email) {
+      await syncToCloud(updated);
+    }
   };
 
   const toggleEditMode = () => {
