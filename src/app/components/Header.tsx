@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import HeaderSearch from '../dashboard/components/HeaderSearch';
+import HeaderSearch from './HeaderSearch';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

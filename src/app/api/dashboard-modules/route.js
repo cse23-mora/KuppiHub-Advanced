@@ -20,27 +20,41 @@ export async function GET(req) {
       return NextResponse.json([]);
     }
 
-    // Fetch modules with video counts
-    const { data, error } = await supabase
-      .from("module_assignments_with_counts")
-      .select("*")
+    // Fetch modules from the modules table
+    const { data: modulesData, error: modulesError } = await supabase
+      .from("modules")
+      .select("id, code, name, description")
+      .in("id", moduleIds);
+
+    if (modulesError) {
+      console.error("Error fetching modules:", modulesError);
+      return NextResponse.json({ error: modulesError.message }, { status: 500 });
+    }
+
+    // Fetch video counts for each module
+    const { data: videoCounts, error: videoError } = await supabase
+      .from("videos")
+      .select("module_id")
       .in("module_id", moduleIds);
 
-    if (error) {
-      console.error("Error fetching dashboard modules:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    // Count videos per module
+    const countMap = {};
+    if (videoCounts) {
+      videoCounts.forEach((v) => {
+        countMap[v.module_id] = (countMap[v.module_id] || 0) + 1;
+      });
     }
 
     // Transform to match expected format
-    const transformedData = data.map((item) => ({
-      module_id: item.module_id,
+    const transformedData = modulesData.map((item) => ({
+      module_id: item.id,
       module: {
-        id: item.module_id,
-        code: item.module_code,
-        name: item.module_name,
-        description: item.module_description,
+        id: item.id,
+        code: item.code,
+        name: item.name,
+        description: item.description || "",
       },
-      video_count: item.video_count,
+      video_count: countMap[item.id] || 0,
     }));
 
     return NextResponse.json(transformedData);
