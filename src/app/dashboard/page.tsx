@@ -311,11 +311,22 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
           <div>
             <h1 className="text-2xl sm:text-4xl font-bold mb-1">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">My Dashboard</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Dashboard</span>
             </h1>
             <p className="text-sm sm:text-lg text-gray-700">Modules you've added to your dashboard</p>
           </div>
           <div className="flex items-center gap-2 sm:space-x-3 flex-wrap sm:flex-nowrap">
+            <button
+              onClick={() => setSelectorOpen(true)}
+              className="px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 flex items-center space-x-1 sm:space-x-2"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span className="hidden xs:inline">Add Modules</span>
+              <span className="xs:hidden">Add</span>
+            </button>
+            <HeaderSearch />
             {modules.length > 0 && (
               <button
                 onClick={toggleEditMode}
@@ -328,17 +339,6 @@ export default function DashboardPage() {
                 {editMode ? 'Done' : 'Edit'}
               </button>
             )}
-            <button
-              onClick={() => setSelectorOpen(true)}
-              className="px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 flex items-center space-x-1 sm:space-x-2"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <span className="hidden xs:inline">Add Modules</span>
-              <span className="xs:hidden">Add</span>
-            </button>
-            <HeaderSearch />
           </div>
         </div>
 

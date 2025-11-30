@@ -39,21 +39,13 @@ export default function Header() {
           {/* Desktop Nav */}
           <div className="hidden sm:flex items-center space-x-6">
             <Link 
-              href="/" 
+              href="/dashboard"
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
-              Home
+              Dashboard
             </Link>
-            {/* <Link 
-              href="/semesters" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              Semesters
-            </Link> */}
             <Link 
               href="/tutors"
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
@@ -63,22 +55,6 @@ export default function Header() {
               Tutors
             </Link>
             <Link 
-              href="/dashboard"
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              href="/about" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              About
-            </Link>
-               <Link 
               href="/add-kuppi" 
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
@@ -164,15 +140,15 @@ export default function Header() {
         >
           
           <div className="p-4 space-y-4 transition-opacity duration-500">
-            {['Home',  'Tutors', 'About', 'Add-Kuppi'].map((item, i) => (
+            {['Dashboard', 'Tutors', 'Add-Kuppi'].map((item, i) => (
               <Link
                 key={i}
-                href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                href={`/${item.toLowerCase()}`}
                 onClick={() => setIsMenuOpen(false)}
                 className="block text-blue-800 font-semibold border border-blue-200 rounded-lg px-4 py-2 
                            hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105"
               >
-                {item}
+                {item === 'Add-Kuppi' ? 'Add Kuppi' : item}
               </Link>
             ))}
 

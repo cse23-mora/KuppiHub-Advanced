@@ -2,6 +2,25 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActionArea from "@mui/material/CardActionArea";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import SchoolIcon from "@mui/icons-material/School";
+import EngineeringIcon from "@mui/icons-material/Engineering";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import ComputerIcon from "@mui/icons-material/Computer";
+import BusinessIcon from "@mui/icons-material/Business";
+import ScienceIcon from "@mui/icons-material/Science";
+import FolderIcon from "@mui/icons-material/Folder";
+import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CloseIcon from "@mui/icons-material/Close";
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 
 interface Module {
   module_id: number;
@@ -23,6 +42,27 @@ interface ModuleSelectorProps {
   onAddModule: (module: Module) => void;
   addedModuleIds: Set<number>;
 }
+
+// Map faculty keys to MUI icons
+const getFacultyIcon = (id: string) => {
+  const iconProps = { sx: { fontSize: 28, color: "#6366f1" } };
+  switch (id) {
+    case "engineering":
+      return <EngineeringIcon {...iconProps} />;
+    case "medicine":
+      return <LocalHospitalIcon {...iconProps} />;
+    case "architecture":
+      return <AccountBalanceIcon {...iconProps} />;
+    case "it":
+      return <ComputerIcon {...iconProps} />;
+    case "business":
+      return <BusinessIcon {...iconProps} />;
+    case "science":
+      return <ScienceIcon {...iconProps} />;
+    default:
+      return <SchoolIcon {...iconProps} />;
+  }
+};
 
 export default function ModuleSelector({
   isOpen,
@@ -85,27 +125,33 @@ export default function ModuleSelector({
     return node;
   }, [hierarchy, selections]);
 
-  // Get current options to display
-  const getCurrentOptions = useCallback((): { id: string; name: string; icon?: string }[] => {
+  // Get current options to display (sorted by order property if present)
+  const getCurrentOptions = useCallback((): { id: string; name: string; icon?: string; order?: number }[] => {
     if (!hierarchy) return [];
     
     if (selections.length === 0) {
       // Root level - show faculties
-      return Object.entries(hierarchy).map(([id, node]: [string, HierarchyData]) => ({
+      const options = Object.entries(hierarchy).map(([id, node]: [string, HierarchyData]) => ({
         id,
         name: node.name,
         icon: node.icon,
+        order: node.order ?? 999,
       }));
+      // Sort by order property
+      return options.sort((a, b) => a.order - b.order);
     }
     
     const currentNode = getCurrentNode();
     if (!currentNode || !currentNode.children) return [];
     
-    return Object.entries(currentNode.children).map(([id, node]: [string, HierarchyData]) => ({
+    const options = Object.entries(currentNode.children).map(([id, node]: [string, HierarchyData]) => ({
       id,
       name: node.name,
       icon: node.icon,
+      order: node.order ?? 999,
     }));
+    // Sort by order property
+    return options.sort((a, b) => a.order - b.order);
   }, [hierarchy, selections, getCurrentNode]);
 
   // Get the current level label
@@ -205,33 +251,43 @@ export default function ModuleSelector({
         exit={{ opacity: 0, y: 100 }}
         className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden sm:mx-4"
       >
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 sm:px-6 py-3 sm:py-4">
+        {/* Header - matching main theme */}
+        <div className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-gray-800 px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-3">
               {selections.length > 0 && (
-                <button onClick={handleBack} className="p-1.5 sm:p-1 hover:bg-white/20 rounded-lg active:bg-white/30">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
+                <button 
+                  onClick={handleBack} 
+                  className="p-1.5 sm:p-2 hover:bg-white/30 rounded-lg active:bg-white/40 transition-colors"
+                >
+                  <ArrowBackIcon sx={{ fontSize: 24 }} />
                 </button>
               )}
-              <h2 className="text-base sm:text-xl font-bold">Add Modules</h2>
+              <h2 className="text-base sm:text-xl font-bold text-gray-800">Add Modules</h2>
             </div>
-            <button onClick={onClose} className="p-1.5 sm:p-1 hover:bg-white/20 rounded-lg active:bg-white/30">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button 
+              onClick={onClose} 
+              className="p-1.5 sm:p-2 hover:bg-white/30 rounded-lg active:bg-white/40 transition-colors"
+            >
+              <CloseIcon sx={{ fontSize: 24 }} />
             </button>
           </div>
 
           {/* Breadcrumb */}
           {breadcrumb.length > 0 && (
-            <div className="mt-2 text-xs sm:text-sm text-blue-100 flex items-center flex-wrap gap-1 overflow-x-auto">
+            <div className="mt-2 text-xs sm:text-sm text-gray-700 flex items-center flex-wrap gap-1 overflow-x-auto">
               {breadcrumb.map((item, index) => (
                 <span key={item.id} className="flex items-center whitespace-nowrap">
-                  {index > 0 && <span className="mx-1">→</span>}
-                  <span>{item.name}</span>
+                  {index > 0 && <span className="mx-1 text-gray-500">→</span>}
+                  <Chip
+                    label={item.name}
+                    size="small"
+                    sx={{
+                      backgroundColor: "rgba(255,255,255,0.7)",
+                      fontSize: "0.75rem",
+                      height: 24,
+                    }}
+                  />
                 </span>
               ))}
             </div>
@@ -239,10 +295,10 @@ export default function ModuleSelector({
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] sm:max-h-[60vh]">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[70vh] sm:max-h-[60vh] bg-gradient-to-br from-blue-50 to-indigo-50">
           {loadingHierarchy ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <CircularProgress sx={{ color: "#8b5cf6" }} />
             </div>
           ) : (
             <AnimatePresence mode="wait">
@@ -257,16 +313,36 @@ export default function ModuleSelector({
                   <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
                     Select {selections.length === 0 ? "Faculty" : getCurrentLevelLabel()}
                   </h3>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                     {currentOptions.map((opt) => (
-                      <button
+                      <Card
                         key={opt.id}
-                        onClick={() => handleSelect(opt.id)}
-                        className="flex items-center space-x-3 p-3 sm:p-4 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 active:bg-blue-100 transition-all text-left"
+                        sx={{
+                          borderRadius: 3,
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                          transition: "all 0.2s ease",
+                          "&:hover": {
+                            boxShadow: "0 4px 16px rgba(99, 102, 241, 0.2)",
+                            transform: "translateY(-2px)",
+                          },
+                        }}
                       >
-                        {opt.icon && <span className="text-xl sm:text-2xl">{opt.icon}</span>}
-                        <span className="font-medium text-gray-800 text-sm sm:text-base">{opt.name}</span>
-                      </button>
+                        <CardActionArea
+                          onClick={() => handleSelect(opt.id)}
+                          sx={{ p: 2 }}
+                        >
+                          <div className="flex items-center space-x-3">
+                            {selections.length === 0 ? (
+                              getFacultyIcon(opt.id)
+                            ) : (
+                              <FolderIcon sx={{ fontSize: 28, color: "#8b5cf6" }} />
+                            )}
+                            <span className="font-medium text-gray-800 text-sm sm:text-base">
+                              {opt.name}
+                            </span>
+                          </div>
+                        </CardActionArea>
+                      </Card>
                     ))}
                   </div>
                 </motion.div>
@@ -280,51 +356,86 @@ export default function ModuleSelector({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                 >
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select Modules</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
+                    Select Modules
+                  </h3>
 
                   {loadingModules ? (
                     <div className="flex justify-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      <CircularProgress sx={{ color: "#8b5cf6" }} />
                     </div>
                   ) : modules.length === 0 ? (
                     <div className="text-center py-8 sm:py-12 text-gray-500">
-                      <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-                      </svg>
+                      <SentimentDissatisfiedIcon sx={{ fontSize: 48, color: "#d1d5db", mb: 1 }} />
                       <p className="text-sm sm:text-base">No modules found for this selection.</p>
                     </div>
                   ) : (
-                    <div className="space-y-2 sm:space-y-3">
+                    <div className="space-y-3">
                       {modules.map((m) => {
                         const isAdded = addedModuleIds.has(m.module_id);
                         return (
-                          <div
+                          <Card
                             key={m.module_id}
-                            className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-xl"
+                            sx={{
+                              borderRadius: 3,
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                            }}
                           >
-                            <div className="flex-1 min-w-0 mr-2">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-semibold text-blue-600 text-sm sm:text-base">{m.module.code}</span>
-                                {m.video_count !== undefined && (
-                                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                                    {m.video_count} videos
-                                  </span>
-                                )}
+                            <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1 min-w-0 mr-3">
+                                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                                    <span className="font-semibold text-indigo-600 text-sm sm:text-base">
+                                      {m.module.code}
+                                    </span>
+                                    {m.video_count !== undefined && (
+                                      <Chip
+                                        label={`${m.video_count} videos`}
+                                        size="small"
+                                        sx={{
+                                          backgroundColor: "#e0e7ff",
+                                          color: "#4f46e5",
+                                          fontSize: "0.7rem",
+                                          height: 22,
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+                                  <p className="text-gray-700 text-sm truncate">{m.module.name}</p>
+                                </div>
+                                <Button
+                                  variant={isAdded ? "outlined" : "contained"}
+                                  size="small"
+                                  onClick={() => onAddModule(m)}
+                                  disabled={isAdded}
+                                  startIcon={isAdded ? <CheckIcon /> : <AddIcon />}
+                                  sx={{
+                                    flexShrink: 0,
+                                    borderRadius: 2,
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    ...(isAdded
+                                      ? {
+                                          borderColor: "#10b981",
+                                          color: "#10b981",
+                                          "&.Mui-disabled": {
+                                            borderColor: "#10b981",
+                                            color: "#10b981",
+                                          },
+                                        }
+                                      : {
+                                          background: "linear-gradient(to right, #8b5cf6, #6366f1)",
+                                          "&:hover": {
+                                            background: "linear-gradient(to right, #7c3aed, #4f46e5)",
+                                          },
+                                        }),
+                                  }}
+                                >
+                                  {isAdded ? "Added" : "Add"}
+                                </Button>
                               </div>
-                              <p className="text-gray-700 text-sm truncate">{m.module.name}</p>
-                            </div>
-                            <button
-                              onClick={() => onAddModule(m)}
-                              disabled={isAdded}
-                              className={`flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                isAdded
-                                  ? "bg-green-100 text-green-600 cursor-not-allowed"
-                                  : "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800"
-                              }`}
-                            >
-                              {isAdded ? "✓" : "+ Add"}
-                            </button>
-                          </div>
+                            </CardContent>
+                          </Card>
                         );
                       })}
                     </div>
@@ -336,7 +447,7 @@ export default function ModuleSelector({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+        <div className="border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 bg-white">
           <p className="text-xs sm:text-sm text-gray-500 text-center">
             {showModules
               ? `${modules.length} modules found`
