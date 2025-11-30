@@ -8,7 +8,6 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import NotificationSnackbar from "./components/NotificationSnackbar";
-import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -88,16 +87,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen flex flex-col`}
       >
-        <Providers>
-          <Header />
+        <Header />
 
-          <main className="flex-1">
-            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-          </main>
+        <main className="flex-1">
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        </main>
 
-          <Footer />
-          <ScrollToTopButton />
-        </Providers>
+        <Footer />
+        <ScrollToTopButton />
         
         {/* <NotificationSnackbar /> */}
 
