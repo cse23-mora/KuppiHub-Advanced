@@ -222,6 +222,10 @@ CREATE POLICY "Modules are viewable by everyone" ON public.modules
 CREATE POLICY "Modules can be managed by admins" ON public.modules
     FOR ALL USING (auth.role() = 'service_role');
 
+-- Users: Anyone can create a profile (needed for Firebase auth signup)
+CREATE POLICY "Anyone can create a profile" ON public.users
+    FOR INSERT WITH CHECK (true);
+
 -- Users: Users can read their own data
 CREATE POLICY "Users can view own profile" ON public.users
     FOR SELECT USING (true); -- Public profiles

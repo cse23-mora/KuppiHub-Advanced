@@ -102,6 +102,14 @@ export default function Header() {
             >
               About
             </Link>
+            <Link 
+              href="/dashboard" 
+              className="px-4 py-2 rounded-full font-bold text-white bg-gradient-to-r from-green-500 to-teal-500 
+                         hover:from-green-600 hover:to-teal-600 shadow-md
+                         transition-all duration-500 ease-in-out transform hover:scale-105"
+            >
+              Dashboard
+            </Link>
 
             {/* Auth Section */}
             {loading ? (
@@ -190,13 +198,15 @@ export default function Header() {
         >
           
           <div className="p-4 space-y-4 transition-opacity duration-500">
-            {['Home', 'Search', 'Tutors', 'About'].map((item, i) => (
+            {['Home', 'Search', 'Tutors', 'About', 'Dashboard'].map((item, i) => (
               <Link
                 key={i}
                 href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
                 onClick={() => setIsMenuOpen(false)}
-                className="block text-blue-800 font-semibold border border-blue-200 rounded-lg px-4 py-2 
-                           hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105"
+                className={`block font-semibold rounded-lg px-4 py-2 transition-all duration-300 ease-in-out transform hover:scale-105
+                           ${item === 'Dashboard' 
+                             ? 'text-white bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600' 
+                             : 'text-blue-800 border border-blue-200 hover:bg-blue-600 hover:text-white'}`}
               >
                 {item}
               </Link>
@@ -204,14 +214,6 @@ export default function Header() {
 
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block text-blue-800 font-semibold border border-blue-200 rounded-lg px-4 py-2 
-                             hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105"
-                >
-                  Dashboard
-                </Link>
                 <Link
                   href="/add-kuppi"
                   onClick={() => setIsMenuOpen(false)}

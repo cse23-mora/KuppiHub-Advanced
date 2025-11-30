@@ -467,15 +467,180 @@ export const universityData: FacultyData[] = [
   {
     id: 'architecture',
     name: 'Faculty of Architecture',
-    hasDepartments: false,
-    semesters: [
+    hasDepartments: true,
+    departments: [
       {
-        id: 'sem1',
-        name: 'Semester 1',
-        number: 1,
-        modules: [
-          { code: 'AR1010', name: 'Design Fundamentals' },
-          { code: 'AR1020', name: 'Architectural Drawing' },
+        id: 'barch',
+        name: 'B.Sc. Architecture',
+        semesters: [
+          {
+            id: 'sem1',
+            name: 'Semester 1',
+            number: 1,
+            modules: [
+              { code: 'AR1011', name: 'Design Fundamentals I' },
+              { code: 'AR1021', name: 'Architectural Drawing I' },
+              { code: 'AR1031', name: 'History of Architecture I' },
+              { code: 'AR1041', name: 'Building Construction I' },
+              { code: 'AR1051', name: 'Environmental Studies' },
+            ],
+          },
+          {
+            id: 'sem2',
+            name: 'Semester 2',
+            number: 2,
+            modules: [
+              { code: 'AR1012', name: 'Design Fundamentals II' },
+              { code: 'AR1022', name: 'Architectural Drawing II' },
+              { code: 'AR1032', name: 'History of Architecture II' },
+              { code: 'AR1042', name: 'Building Construction II' },
+              { code: 'AR1052', name: 'Structural Mechanics' },
+            ],
+          },
+          {
+            id: 'sem3',
+            name: 'Semester 3',
+            number: 3,
+            modules: [
+              { code: 'AR2013', name: 'Architectural Design I' },
+              { code: 'AR2023', name: 'Building Services I' },
+              { code: 'AR2033', name: 'Theory of Architecture I' },
+              { code: 'AR2043', name: 'Building Materials' },
+            ],
+          },
+          {
+            id: 'sem4',
+            name: 'Semester 4',
+            number: 4,
+            modules: [
+              { code: 'AR2014', name: 'Architectural Design II' },
+              { code: 'AR2024', name: 'Building Services II' },
+              { code: 'AR2034', name: 'Theory of Architecture II' },
+              { code: 'AR2044', name: 'Urban Design Fundamentals' },
+            ],
+          },
+          {
+            id: 'sem5',
+            name: 'Semester 5',
+            number: 5,
+            modules: [
+              { code: 'AR3015', name: 'Architectural Design III' },
+              { code: 'AR3025', name: 'Construction Technology' },
+              { code: 'AR3035', name: 'Landscape Architecture' },
+              { code: 'AR3045', name: 'Professional Practice I' },
+            ],
+          },
+          {
+            id: 'sem6',
+            name: 'Semester 6',
+            number: 6,
+            modules: [
+              { code: 'AR3016', name: 'Architectural Design IV' },
+              { code: 'AR3026', name: 'Interior Design' },
+              { code: 'AR3036', name: 'Urban Planning' },
+              { code: 'AR3046', name: 'Professional Practice II' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'bqe',
+        name: 'B.Sc. Quantity Surveying',
+        semesters: [
+          {
+            id: 'sem1',
+            name: 'Semester 1',
+            number: 1,
+            modules: [
+              { code: 'QS1011', name: 'Introduction to Quantity Surveying' },
+              { code: 'QS1021', name: 'Construction Technology I' },
+              { code: 'QS1031', name: 'Measurement I' },
+              { code: 'QS1041', name: 'Mathematics for QS' },
+            ],
+          },
+          {
+            id: 'sem2',
+            name: 'Semester 2',
+            number: 2,
+            modules: [
+              { code: 'QS1012', name: 'Cost Studies I' },
+              { code: 'QS1022', name: 'Construction Technology II' },
+              { code: 'QS1032', name: 'Measurement II' },
+              { code: 'QS1042', name: 'Contract Law' },
+            ],
+          },
+          {
+            id: 'sem3',
+            name: 'Semester 3',
+            number: 3,
+            modules: [
+              { code: 'QS2013', name: 'Cost Studies II' },
+              { code: 'QS2023', name: 'Construction Economics' },
+              { code: 'QS2033', name: 'Building Services' },
+              { code: 'QS2043', name: 'Project Management I' },
+            ],
+          },
+          {
+            id: 'sem4',
+            name: 'Semester 4',
+            number: 4,
+            modules: [
+              { code: 'QS2014', name: 'Cost Planning' },
+              { code: 'QS2024', name: 'Contract Administration' },
+              { code: 'QS2034', name: 'Structural Systems' },
+              { code: 'QS2044', name: 'Project Management II' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'btp',
+        name: 'B.Sc. Town & Country Planning',
+        semesters: [
+          {
+            id: 'sem1',
+            name: 'Semester 1',
+            number: 1,
+            modules: [
+              { code: 'TP1011', name: 'Introduction to Planning' },
+              { code: 'TP1021', name: 'Planning Graphics' },
+              { code: 'TP1031', name: 'Geography for Planners' },
+              { code: 'TP1041', name: 'Statistics for Planning' },
+            ],
+          },
+          {
+            id: 'sem2',
+            name: 'Semester 2',
+            number: 2,
+            modules: [
+              { code: 'TP1012', name: 'Planning Theory I' },
+              { code: 'TP1022', name: 'Land Use Planning' },
+              { code: 'TP1032', name: 'Environmental Planning' },
+              { code: 'TP1042', name: 'GIS for Planners' },
+            ],
+          },
+          {
+            id: 'sem3',
+            name: 'Semester 3',
+            number: 3,
+            modules: [
+              { code: 'TP2013', name: 'Urban Planning Studio I' },
+              { code: 'TP2023', name: 'Transportation Planning' },
+              { code: 'TP2033', name: 'Planning Law' },
+              { code: 'TP2043', name: 'Housing Studies' },
+            ],
+          },
+          {
+            id: 'sem4',
+            name: 'Semester 4',
+            number: 4,
+            modules: [
+              { code: 'TP2014', name: 'Urban Planning Studio II' },
+              { code: 'TP2024', name: 'Regional Planning' },
+              { code: 'TP2034', name: 'Infrastructure Planning' },
+              { code: 'TP2044', name: 'Planning Practice' },
+            ],
+          },
         ],
       },
     ],

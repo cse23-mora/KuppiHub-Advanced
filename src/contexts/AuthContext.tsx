@@ -67,11 +67,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const newProfile = {
           firebase_uid: firebaseUser.uid,
           email: firebaseUser.email || '',
-          display_name: firebaseUser.displayName,
-          photo_url: firebaseUser.photoURL,
+          display_name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          photo_url: firebaseUser.photoURL || null,
           role: 'student',
           is_verified_tutor: false,
         };
+
+        console.log('Creating new profile:', newProfile);
 
         const { data: createdProfile, error: createError } = await supabase
           .from('users')
@@ -80,14 +82,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           .single();
 
         if (createError) {
-          console.error('Error creating profile:', createError);
+          console.error('Error creating profile:', JSON.stringify(createError, null, 2));
+          console.error('Error code:', createError.code);
+          console.error('Error message:', createError.message);
+          console.error('Error details:', createError.details);
+          
+          // If it's a duplicate key error, try to fetch the existing profile
+          if (createError.code === '23505') {
+            const { data: existingUser } = await supabase
+              .from('users')
+              .select('*')
+              .eq('firebase_uid', firebaseUser.uid)
+              .single();
+            return existingUser as UserProfile;
+          }
           return null;
         }
 
         return createdProfile as UserProfile;
       }
 
-      console.error('Error fetching profile:', fetchError);
+      console.error('Error fetching profile:', JSON.stringify(fetchError, null, 2));
       return null;
     } catch (error) {
       console.error('Error in fetchOrCreateProfile:', error);
