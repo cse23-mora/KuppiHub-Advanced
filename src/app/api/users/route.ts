@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from '@/lib/supabase';
 
+// Check if Supabase is configured
+const isSupabaseConfigured = () => {
+  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+};
+
 // GET - Fetch user by firebase_uid or email
 export async function GET(request: NextRequest) {
   try {
@@ -36,19 +41,36 @@ export async function GET(request: NextRequest) {
 // POST - Create or update user
 export async function POST(request: NextRequest) {
   try {
+    // Check Supabase configuration first
+    if (!isSupabaseConfigured()) {
+      console.error('Supabase is not configured. Missing environment variables.');
+      return NextResponse.json({ 
+        error: 'Database not configured', 
+        message: 'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      }, { status: 500 });
+    }
+
     const body = await request.json();
     const { firebase_uid, email, display_name, photo_url, is_verified, auth_provider } = body;
+
+    console.log('POST /api/users - Received:', { firebase_uid, email, display_name, auth_provider });
 
     if (!firebase_uid || !email) {
       return NextResponse.json({ error: 'firebase_uid and email are required' }, { status: 400 });
     }
 
     // First, check if user already exists by firebase_uid
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error: fetchError } = await supabase
       .from('users')
       .select('*')
       .eq('firebase_uid', firebase_uid)
       .single();
+
+    // Log fetch result (PGRST116 = no rows found, which is OK)
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error('Error fetching existing user:', fetchError);
+      throw fetchError;
+    }
 
     if (existingUser) {
       // User exists, update it
@@ -124,9 +146,16 @@ export async function POST(request: NextRequest) {
       success: true,
       user: data 
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error saving user:', error);
-    return NextResponse.json({ error: 'Failed to save user' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorDetails = typeof error === 'object' && error !== null ? JSON.stringify(error, Object.getOwnPropertyNames(error)) : String(error);
+    return NextResponse.json({ 
+      error: 'Failed to save user', 
+      message: errorMessage,
+      details: errorDetails,
+      code: (error as { code?: string })?.code || ''
+    }, { status: 500 });
   }
 }
 

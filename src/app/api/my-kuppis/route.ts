@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
+import { authenticateRequest } from "@/lib/firebase-admin";
+import {
+  validateTitle,
+  validateDescription,
+  validateLanguageCode,
+  validateUrlArray,
+  isValidYoutubeUrl,
+  isValidTelegramUrl,
+  isValidGdriveUrl,
+  isValidOnedriveUrl,
+} from "@/lib/validation";
 
 // GET - Fetch all kuppis added by the logged-in user
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const firebase_uid = searchParams.get("firebase_uid");
+    // Verify authentication via Bearer token
+    const authHeader = request.headers.get("authorization");
+    const verifiedUser = await authenticateRequest(authHeader);
 
-    if (!firebase_uid) {
+    if (!verifiedUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user ID from firebase_uid
+    // Get user ID from verified Firebase UID
     const { data: userData } = await supabase
       .from("users")
       .select("id")
-      .eq("firebase_uid", firebase_uid)
+      .eq("firebase_uid", verifiedUser.uid)
       .single();
 
     if (!userData) {
@@ -68,9 +80,16 @@ export async function GET(request: NextRequest) {
 // PUT - Update a kuppi (title, description, links, or hide/unhide)
 export async function PUT(request: NextRequest) {
   try {
+    // Verify authentication via Bearer token
+    const authHeader = request.headers.get("authorization");
+    const verifiedUser = await authenticateRequest(authHeader);
+
+    if (!verifiedUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
-      firebase_uid,
       video_id,
       title,
       description,
@@ -83,19 +102,15 @@ export async function PUT(request: NextRequest) {
       material_urls,
     } = body;
 
-    if (!firebase_uid) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!video_id || typeof video_id !== "number") {
+      return NextResponse.json({ error: "Valid Video ID is required" }, { status: 400 });
     }
 
-    if (!video_id) {
-      return NextResponse.json({ error: "Video ID is required" }, { status: 400 });
-    }
-
-    // Get user ID from firebase_uid
+    // Get user ID from verified Firebase UID
     const { data: userData } = await supabase
       .from("users")
       .select("id")
-      .eq("firebase_uid", firebase_uid)
+      .eq("firebase_uid", verifiedUser.uid)
       .single();
 
     if (!userData) {
@@ -117,19 +132,60 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "You can only edit your own kuppis" }, { status: 403 });
     }
 
-    // Build update object with only provided fields
+    // Build update object with validated and sanitized fields
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateData: Record<string, any> = {};
 
-    if (title !== undefined) updateData.title = title.trim();
-    if (description !== undefined) updateData.description = description.trim();
-    if (language_code !== undefined) updateData.language_code = language_code;
-    if (is_hidden !== undefined) updateData.is_hidden = is_hidden;
-    if (youtube_links !== undefined) updateData.youtube_links = youtube_links;
-    if (telegram_links !== undefined) updateData.telegram_links = telegram_links;
-    if (gdrive_cloud_video_urls !== undefined) updateData.gdrive_cloud_video_urls = gdrive_cloud_video_urls;
-    if (onedrive_cloud_video_urls !== undefined) updateData.onedrive_cloud_video_urls = onedrive_cloud_video_urls;
-    if (material_urls !== undefined) updateData.material_urls = material_urls;
+    // Validate title if provided
+    if (title !== undefined) {
+      const titleValidation = validateTitle(title);
+      if (!titleValidation.valid) {
+        return NextResponse.json({ error: titleValidation.error }, { status: 400 });
+      }
+      updateData.title = titleValidation.sanitized;
+    }
+
+    // Validate description if provided
+    if (description !== undefined) {
+      const descValidation = validateDescription(description);
+      if (!descValidation.valid) {
+        return NextResponse.json({ error: descValidation.error }, { status: 400 });
+      }
+      updateData.description = descValidation.sanitized;
+    }
+
+    // Validate language code if provided
+    if (language_code !== undefined) {
+      if (!validateLanguageCode(language_code)) {
+        return NextResponse.json({ error: "Invalid language code" }, { status: 400 });
+      }
+      updateData.language_code = language_code;
+    }
+
+    // Validate is_hidden if provided
+    if (is_hidden !== undefined) {
+      if (typeof is_hidden !== "boolean") {
+        return NextResponse.json({ error: "Invalid is_hidden value" }, { status: 400 });
+      }
+      updateData.is_hidden = is_hidden;
+    }
+
+    // Validate and sanitize URLs if provided
+    if (youtube_links !== undefined) {
+      updateData.youtube_links = validateUrlArray(youtube_links, isValidYoutubeUrl);
+    }
+    if (telegram_links !== undefined) {
+      updateData.telegram_links = validateUrlArray(telegram_links, isValidTelegramUrl);
+    }
+    if (gdrive_cloud_video_urls !== undefined) {
+      updateData.gdrive_cloud_video_urls = validateUrlArray(gdrive_cloud_video_urls, isValidGdriveUrl);
+    }
+    if (onedrive_cloud_video_urls !== undefined) {
+      updateData.onedrive_cloud_video_urls = validateUrlArray(onedrive_cloud_video_urls, isValidOnedriveUrl);
+    }
+    if (material_urls !== undefined) {
+      updateData.material_urls = validateUrlArray(material_urls);
+    }
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
@@ -164,22 +220,26 @@ export async function PUT(request: NextRequest) {
 // PATCH - Toggle hide/unhide a kuppi (quick action)
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { firebase_uid, video_id } = body;
+    // Verify authentication via Bearer token
+    const authHeader = request.headers.get("authorization");
+    const verifiedUser = await authenticateRequest(authHeader);
 
-    if (!firebase_uid) {
+    if (!verifiedUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!video_id) {
-      return NextResponse.json({ error: "Video ID is required" }, { status: 400 });
+    const body = await request.json();
+    const { video_id } = body;
+
+    if (!video_id || typeof video_id !== "number") {
+      return NextResponse.json({ error: "Valid Video ID is required" }, { status: 400 });
     }
 
-    // Get user ID from firebase_uid
+    // Get user ID from verified Firebase UID
     const { data: userData } = await supabase
       .from("users")
       .select("id")
-      .eq("firebase_uid", firebase_uid)
+      .eq("firebase_uid", verifiedUser.uid)
       .single();
 
     if (!userData) {

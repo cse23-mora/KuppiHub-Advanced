@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
+import { authenticateRequest } from "@/lib/firebase-admin";
+import {
+  validateTitle,
+  validateDescription,
+  validateLanguageCode,
+  validateIndexNo,
+  validateUrlArray,
+  isValidYoutubeUrl,
+  isValidTelegramUrl,
+  isValidGdriveUrl,
+  isValidOnedriveUrl,
+  validateUrl,
+} from "@/lib/validation";
 
 // Helper function to get user ID from firebase_uid
 async function getUserIdFromFirebaseUid(firebaseUid: string): Promise<number | null> {
@@ -48,6 +61,26 @@ async function findOrCreateStudent(indexNo: string): Promise<number | null> {
 
 export async function POST(request: NextRequest) {
   try {
+    // ============ SERVER-SIDE AUTHENTICATION ============
+    // Verify the Firebase ID token from Authorization header
+    const authHeader = request.headers.get("authorization");
+    const verifiedUser = await authenticateRequest(authHeader);
+
+    if (!verifiedUser) {
+      return NextResponse.json(
+        { error: "Unauthorized. Please log in and try again." },
+        { status: 401 }
+      );
+    }
+
+    // Ensure email is verified
+    if (!verifiedUser.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email before adding a kuppi." },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const {
       module_id,
@@ -61,43 +94,55 @@ export async function POST(request: NextRequest) {
       gdrive_cloud_video_urls,
       onedrive_cloud_video_urls,
       material_urls,
-      firebase_uid, // NEW: Track who added this kuppi
     } = body;
 
-    // Validation
-    if (!firebase_uid) {
-      return NextResponse.json({ error: "You must be logged in to add a kuppi" }, { status: 401 });
-    }
-    if (!module_id) {
-      return NextResponse.json({ error: "Module is required" }, { status: 400 });
-    }
-    if (!title || title.trim().length === 0) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
-    }
-    if (!description || description.trim().length === 0) {
-      return NextResponse.json({ error: "Description is required" }, { status: 400 });
-    }
-    if (!language_code) {
-      return NextResponse.json({ error: "Language is required" }, { status: 400 });
+    // ============ INPUT VALIDATION ============
+    // Validate module_id
+    if (!module_id || typeof module_id !== "number") {
+      return NextResponse.json({ error: "Valid module is required" }, { status: 400 });
     }
 
-    // Must have at least one link
-    const hasLinks =
-      (youtube_links && youtube_links.length > 0) ||
-      (telegram_links && telegram_links.length > 0) ||
-      (gdrive_cloud_video_urls && gdrive_cloud_video_urls.length > 0) ||
-      (onedrive_cloud_video_urls && onedrive_cloud_video_urls.length > 0) ||
-      (material_urls && material_urls.length > 0);
+    // Validate and sanitize title
+    const titleValidation = validateTitle(title);
+    if (!titleValidation.valid) {
+      return NextResponse.json({ error: titleValidation.error }, { status: 400 });
+    }
 
-    if (!hasLinks) {
+    // Validate and sanitize description
+    const descValidation = validateDescription(description);
+    if (!descValidation.valid) {
+      return NextResponse.json({ error: descValidation.error }, { status: 400 });
+    }
+
+    // Validate language code
+    if (!validateLanguageCode(language_code)) {
+      return NextResponse.json({ error: "Invalid language code" }, { status: 400 });
+    }
+
+    // Validate and sanitize URLs
+    const validYoutubeLinks = validateUrlArray(youtube_links, isValidYoutubeUrl);
+    const validTelegramLinks = validateUrlArray(telegram_links, isValidTelegramUrl);
+    const validGdriveLinks = validateUrlArray(gdrive_cloud_video_urls, isValidGdriveUrl);
+    const validOnedriveLinks = validateUrlArray(onedrive_cloud_video_urls, isValidOnedriveUrl);
+    const validMaterialLinks = validateUrlArray(material_urls);
+
+    // Must have at least one valid link
+    const hasValidLinks =
+      validYoutubeLinks.length > 0 ||
+      validTelegramLinks.length > 0 ||
+      validGdriveLinks.length > 0 ||
+      validOnedriveLinks.length > 0 ||
+      validMaterialLinks.length > 0;
+
+    if (!hasValidLinks) {
       return NextResponse.json(
-        { error: "At least one video or material link is required" },
+        { error: "At least one valid video or material link is required" },
         { status: 400 }
       );
     }
 
-    // Get user ID from firebase_uid
-    const added_by_user_id = await getUserIdFromFirebaseUid(firebase_uid);
+    // Get user ID from verified Firebase UID
+    const added_by_user_id = await getUserIdFromFirebaseUid(verifiedUser.uid);
     if (!added_by_user_id) {
       return NextResponse.json(
         { error: "User not found. Please log in again." },
@@ -105,34 +150,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find or create student by index_no if provided
-    let student_id = null;
-    if (index_no && index_no.trim()) {
-      student_id = await findOrCreateStudent(index_no);
+    // Validate index number if provided
+    let validatedIndexNo: string | null = null;
+    if (index_no && typeof index_no === "string" && index_no.trim()) {
+      validatedIndexNo = validateIndexNo(index_no);
     }
 
-    // Insert video with added_by_user_id
+    // Find or create student by validated index_no if provided
+    let student_id = null;
+    if (validatedIndexNo) {
+      student_id = await findOrCreateStudent(validatedIndexNo);
+    }
+
+    // Insert video with sanitized data
     const { data, error } = await supabase
       .from("videos")
       .insert({
         module_id,
-        title: title.trim(),
-        description: description.trim(),
+        title: titleValidation.sanitized,
+        description: descValidation.sanitized,
         language_code,
         is_kuppi: is_kuppi ?? true,
         student_id,
-        added_by_user_id, // NEW: Track who added this kuppi
-        youtube_links: youtube_links && youtube_links.length > 0 ? youtube_links : [],
-        telegram_links: telegram_links && telegram_links.length > 0 ? telegram_links : null,
-        gdrive_cloud_video_urls:
-          gdrive_cloud_video_urls && gdrive_cloud_video_urls.length > 0
-            ? gdrive_cloud_video_urls
-            : null,
-        onedrive_cloud_video_urls:
-          onedrive_cloud_video_urls && onedrive_cloud_video_urls.length > 0
-            ? onedrive_cloud_video_urls
-            : null,
-        material_urls: material_urls && material_urls.length > 0 ? material_urls : null,
+        added_by_user_id,
+        youtube_links: validYoutubeLinks.length > 0 ? validYoutubeLinks : [],
+        telegram_links: validTelegramLinks.length > 0 ? validTelegramLinks : null,
+        gdrive_cloud_video_urls: validGdriveLinks.length > 0 ? validGdriveLinks : null,
+        onedrive_cloud_video_urls: validOnedriveLinks.length > 0 ? validOnedriveLinks : null,
+        material_urls: validMaterialLinks.length > 0 ? validMaterialLinks : null,
         published_at: new Date().toISOString().split("T")[0],
       })
       .select()

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { authPost } from "@/lib/auth-fetch";
 import Link from "next/link";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -119,23 +120,19 @@ export default function AddKuppiPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/add-kuppi", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          module_id: formData.moduleId,
-          title: formData.title.trim(),
-          description: formData.description.trim(),
-          language_code: formData.languageCode,
-          index_no: formData.indexNo.trim() || null,
-          is_kuppi: formData.isKuppi,
-          youtube_links: youtubeLinks,
-          telegram_links: telegramLinks.length > 0 ? telegramLinks : null,
-          gdrive_cloud_video_urls: gdriveLinks.length > 0 ? gdriveLinks : null,
-          onedrive_cloud_video_urls: onedriveLinks.length > 0 ? onedriveLinks : null,
-          material_urls: materialLinks.length > 0 ? materialLinks : null,
-          firebase_uid: user?.uid,
-        }),
+      // Use authenticated request with Firebase ID token
+      const response = await authPost("/api/add-kuppi", {
+        module_id: formData.moduleId,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        language_code: formData.languageCode,
+        index_no: formData.indexNo.trim() || null,
+        is_kuppi: formData.isKuppi,
+        youtube_links: youtubeLinks,
+        telegram_links: telegramLinks.length > 0 ? telegramLinks : null,
+        gdrive_cloud_video_urls: gdriveLinks.length > 0 ? gdriveLinks : null,
+        onedrive_cloud_video_urls: onedriveLinks.length > 0 ? onedriveLinks : null,
+        material_urls: materialLinks.length > 0 ? materialLinks : null,
       });
 
       if (!response.ok) {

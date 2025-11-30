@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { authGet, authPatch, authPut } from "@/lib/auth-fetch";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   KuppiHeader,
@@ -33,7 +34,8 @@ export default function MyKuppisPage() {
       
       setLoading(true);
       try {
-        const res = await fetch(`/api/my-kuppis?firebase_uid=${user.uid}`);
+        // Use authenticated GET request
+        const res = await authGet("/api/my-kuppis");
         const data = await res.json();
         
         if (!res.ok) {
@@ -67,13 +69,9 @@ export default function MyKuppisPage() {
     
     setTogglingId(kuppiId);
     try {
-      const res = await fetch("/api/my-kuppis", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebase_uid: user.uid,
-          video_id: kuppiId,
-        }),
+      // Use authenticated PATCH request
+      const res = await authPatch("/api/my-kuppis", {
+        video_id: kuppiId,
       });
       
       const data = await res.json();
@@ -116,16 +114,12 @@ export default function MyKuppisPage() {
     
     setSaving(true);
     try {
-      const res = await fetch("/api/my-kuppis", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firebase_uid: user.uid,
-          video_id: editingKuppi.id,
-          title: form.title,
-          description: form.description,
-          ...cleanedLinks,
-        }),
+      // Use authenticated PUT request
+      const res = await authPut("/api/my-kuppis", {
+        video_id: editingKuppi.id,
+        title: form.title,
+        description: form.description,
+        ...cleanedLinks,
       });
       
       const data = await res.json();
