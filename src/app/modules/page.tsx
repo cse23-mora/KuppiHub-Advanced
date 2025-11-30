@@ -30,9 +30,6 @@ export default function ModulesPage() {
   const [facultyId, setFacultyId] = useState<string | null>(null);
   const [departmentId, setDepartmentId] = useState<string | null>(null);
 
-  // whether user has enabled auto-redirect (stored in localStorage)
-  const [autoRedirectEnabled, setAutoRedirectEnabled] = useState(false);
-
   // redirect to /faculty if required params missing
   useEffect(() => {
     if (!facultyParam || !departmentParam || !semesterParam) {
@@ -57,66 +54,30 @@ export default function ModulesPage() {
       .finally(() => setLoading(false));
   }, [facultyParam, departmentParam, semesterParam, router]);
 
-  // initialize autoRedirectEnabled from localStorage on client
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem("autoRedirectModules") === "true";
-    setAutoRedirectEnabled(saved);
-
-    // if it was already enabled, ensure the saved URL points to the current selection
-    if (
-      saved &&
-      facultyParam &&
-      departmentParam &&
-      semesterParam
-    ) {
-      localStorage.setItem(
-        "lastModuleURL",
-        `/modules?faculty=${facultyParam}&department=${departmentParam}&semester=${semesterParam}`
-      );
-    }
-    // only run this on mount / when params change
-  }, [facultyParam, departmentParam, semesterParam]);
-
-  // keep saved lastModuleURL updated while auto-redirect is enabled
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (
-      autoRedirectEnabled &&
-      facultyParam &&
-      departmentParam &&
-      semesterParam
-    ) {
-      localStorage.setItem(
-        "lastModuleURL",
-        `/modules?faculty=${facultyParam}&department=${departmentParam}&semester=${semesterParam}`
-      );
-    }
-  }, [autoRedirectEnabled, facultyParam, departmentParam, semesterParam]);
-
-  const handleAutoRedirectToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setAutoRedirectEnabled(checked);
-
-    if (typeof window === "undefined") return;
-
-    localStorage.setItem("autoRedirectModules", checked ? "true" : "false");
-
-    if (checked) {
-      if (facultyParam && departmentParam && semesterParam) {
-        localStorage.setItem(
-          "lastModuleURL",
-          `/modules?faculty=${facultyParam}&department=${departmentParam}&semester=${semesterParam}`
-        );
-      }
-    } else {
-      // you can remove lastModuleURL or keep it — here we remove to be explicit
-      localStorage.removeItem("lastModuleURL");
-    }
-  };
-
   const handleModuleSelect = (moduleId: number) => {
     router.push(`/module-kuppi/${moduleId}`);
+  };
+
+  const handleAddAllToDashboard = () => {
+    if (typeof window === 'undefined' || modules.length === 0) return;
+    try {
+      const existingRaw = localStorage.getItem('dashboardModules');
+      const existing: ModuleData[] = existingRaw ? JSON.parse(existingRaw) : [];
+
+      // Merge all current modules, ensuring unique by module_id
+      const mergedMap: Record<number, ModuleData> = {};
+      existing.forEach((m) => (mergedMap[m.module_id] = m));
+      modules.forEach((m) => (mergedMap[m.module_id] = m));
+
+      const merged = Object.values(mergedMap);
+      localStorage.setItem('dashboardModules', JSON.stringify(merged));
+
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Failed to save dashboard modules', err);
+      alert('Failed to add to Dashboard');
+    }
   };
 
   const handleBack = () => {
@@ -164,28 +125,16 @@ export default function ModulesPage() {
             </div>
           </div>
 
-          {/* Checkbox placed in Modules page as requested */}
-     <div className="flex">
-  <div className="flex items-center h-5">
-    <input
-      id="default-selection-checkbox"
-      aria-describedby="default-selection-text"
-      type="checkbox"
-      checked={autoRedirectEnabled}
-      onChange={handleAutoRedirectToggle}
-      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 focus:ring-2"
-    />
-  </div>
-  <div className="ms-2 text-sm">
-    <label
-      htmlFor="default-selection-checkbox"
-      className="font-medium text-gray-900"
-    >
-      Set this selection as my default
-    </label>
-
-  </div>
-</div>
+          {/* Add to dashboard button */}
+          <div>
+            <button
+              disabled={modules.length === 0}
+              onClick={handleAddAllToDashboard}
+              className={`px-4 py-2 rounded-full font-semibold text-white transition-all duration-200 ${modules.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            >
+              Add All to Dashboard ({modules.length})
+            </button>
+          </div>
 
         </div>
 
