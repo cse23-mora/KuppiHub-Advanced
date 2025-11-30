@@ -1,20 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import supabase from '@/lib/supabase';
 
+// Helper function to get user_id from firebase_uid
+async function getUserId(firebaseUid: string): Promise<number | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id')
+    .eq('firebase_uid', firebaseUid)
+    .single();
+  
+  if (error || !data) return null;
+  return data.id;
+}
+
 // GET - Fetch user's dashboard modules
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const userEmail = searchParams.get('email');
+    const firebaseUid = searchParams.get('firebase_uid');
 
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!firebaseUid) {
+      return NextResponse.json({ error: 'firebase_uid is required' }, { status: 400 });
+    }
+
+    // Get user_id from firebase_uid
+    const userId = await getUserId(firebaseUid);
+    if (!userId) {
+      return NextResponse.json({ moduleIds: [] }); // User not found, return empty
     }
 
     const { data, error } = await supabase
       .from('user_dashboard_modules')
       .select('module_ids')
-      .eq('user_email', userEmail)
+      .eq('user_id', userId)
       .single();
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
@@ -34,10 +52,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, moduleIds } = body;
+    const { firebase_uid, moduleIds } = body;
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!firebase_uid) {
+      return NextResponse.json({ error: 'firebase_uid is required' }, { status: 400 });
+    }
+
+    // Get user_id from firebase_uid
+    const userId = await getUserId(firebase_uid);
+    if (!userId) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Upsert - insert or update if exists
@@ -45,11 +69,11 @@ export async function POST(request: NextRequest) {
       .from('user_dashboard_modules')
       .upsert(
         { 
-          user_email: email, 
+          user_id: userId, 
           module_ids: moduleIds || [],
           updated_at: new Date().toISOString()
         },
-        { onConflict: 'user_email' }
+        { onConflict: 'user_id' }
       )
       .select();
 

@@ -23,29 +23,76 @@ export default function DashboardPage() {
   const [editMode, setEditMode] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
-  // Sync modules to Supabase (for logged-in users)
-  const syncToCloud = useCallback(async (moduleData: ModuleData[]) => {
-    if (!user?.email) return;
+  // Ensure user exists in Supabase before syncing dashboard
+  const ensureUserExists = useCallback(async (): Promise<boolean> => {
+    if (!user?.uid || !user?.email) return false;
     
     try {
-      const moduleIds = moduleData.map(m => m.module_id);
-      await fetch('/api/user-dashboard', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email, moduleIds }),
+        body: JSON.stringify({
+          firebase_uid: user.uid,
+          email: user.email,
+          display_name: user.displayName,
+          photo_url: user.photoURL,
+          is_verified: user.emailVerified,
+          auth_provider: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+        }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to ensure user exists:', errorData);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Failed to ensure user exists:', err);
+      return false;
+    }
+  }, [user]);
+
+  // Sync modules to Supabase (for logged-in users)
+  const syncToCloud = useCallback(async (moduleData: ModuleData[]) => {
+    if (!user?.uid) return;
+    
+    try {
+      // Ensure user exists first - don't proceed if this fails
+      const userCreated = await ensureUserExists();
+      if (!userCreated) {
+        console.error('Cannot sync: user does not exist in database');
+        return;
+      }
+      
+      const moduleIds = moduleData.map(m => m.module_id);
+      const response = await fetch('/api/user-dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firebase_uid: user.uid, moduleIds }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to sync to cloud:', errorData);
+      }
     } catch (err) {
       console.error('Failed to sync to cloud:', err);
     }
-  }, [user?.email]);
+  }, [user?.uid, ensureUserExists]);
 
   // Load modules from cloud (for logged-in users)
   const loadFromCloud = useCallback(async () => {
-    if (!user?.email) return null;
+    if (!user?.uid) return null;
     
     try {
       setSyncing(true);
-      const res = await fetch(`/api/user-dashboard?email=${encodeURIComponent(user.email)}`);
+      
+      // Ensure user exists first
+      await ensureUserExists();
+      
+      const res = await fetch(`/api/user-dashboard?firebase_uid=${encodeURIComponent(user.uid)}`);
       if (!res.ok) return null;
       const data = await res.json();
       return data.moduleIds || [];
@@ -55,7 +102,7 @@ export default function DashboardPage() {
     } finally {
       setSyncing(false);
     }
-  }, [user?.email]);
+  }, [user?.uid, ensureUserExists]);
 
   // Load modules from localStorage
   const loadModulesFromLocal = useCallback(() => {
@@ -95,7 +142,7 @@ export default function DashboardPage() {
     const initializeModules = async () => {
       const localModules = loadModulesFromLocal();
       
-      if (user?.email) {
+      if (user?.uid) {
         // User is logged in - check cloud storage
         const cloudModuleIds = await loadFromCloud();
         
@@ -146,7 +193,7 @@ export default function DashboardPage() {
       setModules(parsed);
       
       // Sync to cloud if logged in
-      if (user?.email && parsed.length > 0) {
+      if (user?.uid && parsed.length > 0) {
         await syncToCloud(parsed);
       }
     };
@@ -156,7 +203,7 @@ export default function DashboardPage() {
     return () => {
       window.removeEventListener("dashboardModulesUpdated", handleUpdate);
     };
-  }, [user?.email, loadModulesFromLocal, syncToCloud]);
+  }, [user?.uid, loadModulesFromLocal, syncToCloud]);
 
   // Fetch fresh video counts for dashboard modules
   const refreshModuleCounts = async (currentModules: ModuleData[]) => {
@@ -195,7 +242,7 @@ export default function DashboardPage() {
     saveModulesToLocal(updated);
     
     // Sync to cloud if logged in
-    if (user?.email) {
+    if (user?.uid) {
       await syncToCloud(updated);
     }
   };
