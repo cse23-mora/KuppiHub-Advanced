@@ -20,22 +20,41 @@ export default function DashboardPage() {
   const [modules, setModules] = useState<ModuleData[] | null>(null);
   const [editMode, setEditMode] = useState(false);
 
-  // Load modules from localStorage and optionally refresh video counts
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  // Load modules from localStorage
+  const loadModules = () => {
     try {
       const raw = localStorage.getItem("dashboardModules");
       const parsed: ModuleData[] = raw ? JSON.parse(raw) : [];
       setModules(parsed);
-
-      // Optionally refresh video counts from API
-      if (parsed.length > 0) {
-        refreshModuleCounts(parsed);
-      }
+      return parsed;
     } catch (err) {
       console.error("Failed to read dashboard modules", err);
       setModules([]);
+      return [];
     }
+  };
+
+  // Load modules on mount and listen for updates
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const parsed = loadModules();
+    
+    // Optionally refresh video counts from API
+    if (parsed.length > 0) {
+      refreshModuleCounts(parsed);
+    }
+    
+    // Listen for updates from HeaderSearch
+    const handleUpdate = () => {
+      loadModules();
+    };
+    
+    window.addEventListener("dashboardModulesUpdated", handleUpdate);
+    
+    return () => {
+      window.removeEventListener("dashboardModulesUpdated", handleUpdate);
+    };
   }, []);
 
   // Fetch fresh video counts for dashboard modules

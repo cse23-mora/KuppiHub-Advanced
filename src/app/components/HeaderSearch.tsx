@@ -85,6 +85,9 @@ export default function HeaderSearch() {
       existing.push(newModule);
       localStorage.setItem("dashboardModules", JSON.stringify(existing));
       setAddedModules(prev => new Set([...prev, mod.id]));
+      
+      // Dispatch custom event to notify dashboard
+      window.dispatchEvent(new CustomEvent("dashboardModulesUpdated"));
     } catch (err) {
       console.error("Failed to add to dashboard", err);
     }
