@@ -1,14 +1,20 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Search } from "lucide-react"; // search icon
+import { Search } from "lucide-react";
 
 interface Module {
   id: number;
   code: string;
   name: string;
+  description?: string;
   video_count: number;
+}
+
+interface DashboardModule {
+  module_id: number;
+  module: { code: string; name: string; description: string };
+  video_count?: number;
 }
 
 export default function HeaderSearch() {
@@ -16,7 +22,20 @@ export default function HeaderSearch() {
   const [results, setResults] = useState<Module[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const router = useRouter();
+  const [addedModules, setAddedModules] = useState<Set<number>>(new Set());
+
+  // Load already added modules from localStorage when search opens
+  useEffect(() => {
+    if (searchOpen && typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("dashboardModules");
+        const parsed: DashboardModule[] = raw ? JSON.parse(raw) : [];
+        setAddedModules(new Set(parsed.map(m => m.module_id)));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, [searchOpen]);
 
   useEffect(() => {
     if (query.length < 2) {
@@ -40,10 +59,35 @@ export default function HeaderSearch() {
     return () => clearTimeout(debounceTimeout);
   }, [query]);
 
-  const handleGoModule = (moduleId: number) => {
-    setSearchOpen(false);
-    setQuery("");
-    router.push(`/module-kuppi/${moduleId}`);
+  const handleAddToDashboard = (mod: Module) => {
+    if (typeof window === "undefined") return;
+    
+    try {
+      const raw = localStorage.getItem("dashboardModules");
+      const existing: DashboardModule[] = raw ? JSON.parse(raw) : [];
+      
+      // Check if already added
+      if (existing.some(m => m.module_id === mod.id)) {
+        return;
+      }
+      
+      // Add new module
+      const newModule: DashboardModule = {
+        module_id: mod.id,
+        module: {
+          code: mod.code,
+          name: mod.name,
+          description: mod.description || "",
+        },
+        video_count: mod.video_count,
+      };
+      
+      existing.push(newModule);
+      localStorage.setItem("dashboardModules", JSON.stringify(existing));
+      setAddedModules(prev => new Set([...prev, mod.id]));
+    } catch (err) {
+      console.error("Failed to add to dashboard", err);
+    }
   };
 
   return (
@@ -62,34 +106,33 @@ export default function HeaderSearch() {
       {searchOpen && (
         <div className="fixed inset-0 z-50 flex flex-col backdrop-blur-sm bg-black/70">
           {/* Top search bar */}
-  <div className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-white p-3 shadow bg-opacity-20">
-  <div className="max-w-4xl mx-auto flex items-center gap-3">
-    {/* Search Icon */}
-    <Search className="w-5 h-5 text-gray-800" />
+          <div className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-white p-3 shadow bg-opacity-20">
+            <div className="max-w-4xl mx-auto flex items-center gap-3">
+              {/* Search Icon */}
+              <Search className="w-5 h-5 text-gray-800" />
 
-    {/* Input field */}
-    <input
-      type="text"
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      placeholder="Search modules by name or code..."
-      autoFocus
-      className="flex-1 px-3 py-2 rounded-md border border-blue-500 focus:outline-none text-black placeholder-gray-600"
-    />
+              {/* Input field */}
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search modules by name or code..."
+                autoFocus
+                className="flex-1 px-3 py-2 rounded-md border border-blue-500 focus:outline-none text-black placeholder-gray-600"
+              />
 
-    {/* Cancel button */}
-    <button
-      onClick={() => {
-        setSearchOpen(false);
-        setQuery("");
-      }}
-      className="text-xl font-semibold text-red-600 hover:underline"
-    >
-      Cancel
-    </button>
-  </div>
-</div>
-
+              {/* Cancel button */}
+              <button
+                onClick={() => {
+                  setSearchOpen(false);
+                  setQuery("");
+                }}
+                className="text-xl font-semibold text-red-600 hover:underline"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
 
           {/* Results */}
           <div className="flex-1 overflow-y-auto bg-transparent">
@@ -104,12 +147,22 @@ export default function HeaderSearch() {
                 {results.map((mod: Module) => (
                   <div 
                     key={mod.id} 
-                    className="p-4 bg-white rounded-xl shadow hover:shadow-lg cursor-pointer transition transform hover:scale-105"
-                    onClick={() => handleGoModule(mod.id)}
+                    className="p-4 bg-white rounded-xl shadow hover:shadow-lg transition"
                   >
                     <p className="font-bold text-blue-600 text-sm">{mod.code}</p>
                     <p className="font-semibold text-gray-800 mt-1">{mod.name}</p>
                     <p className="text-sm text-gray-600 mt-2">📹 {mod.video_count} video{mod.video_count !== 1 ? 's' : ''}</p>
+                    <button
+                      onClick={() => handleAddToDashboard(mod)}
+                      disabled={addedModules.has(mod.id)}
+                      className={`mt-3 w-full py-1.5 rounded-full text-sm font-semibold transition-all ${
+                        addedModules.has(mod.id)
+                          ? 'bg-green-100 text-green-700 cursor-default'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                    >
+                      {addedModules.has(mod.id) ? '✓ Added to Dashboard' : '+ Add to Dashboard'}
+                    </button>
                   </div>
                 ))}
               </div>
