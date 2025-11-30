@@ -1,5 +1,4 @@
-// app/page.tsx
-"use client";
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -13,7 +12,7 @@ import {
   Button,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   Chip,
   Alert,
   CircularProgress,

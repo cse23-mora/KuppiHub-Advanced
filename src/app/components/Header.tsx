@@ -2,9 +2,45 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import HeaderSearch from '../dashboard/components/HeaderSearch';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Divider,
+  Button,
+  IconButton,
+  CircularProgress,
+} from '@mui/material';
+import {
+  Dashboard as DashboardIcon,
+  Logout as LogoutIcon,
+  Person as PersonIcon,
+  Login as LoginIcon,
+} from '@mui/icons-material';
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const router = useRouter();
+  const { user, userProfile, loading, logOut } = useAuth();
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    handleClose();
+    await logOut();
+    router.push('/');
+  };
 
   return (
     <header className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-white">
@@ -33,26 +69,26 @@ export default function Header() {
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden sm:flex items-center space-x-6">
+          <div className="hidden sm:flex items-center space-x-4">
             <Link 
               href="/" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
+              className="px-4 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
               Home
             </Link>
-            {/* <Link 
-              href="/semesters" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
+            <Link 
+              href="/search"
+              className="px-4 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
-              Semesters
-            </Link> */}
+              Search
+            </Link>
             <Link 
               href="/tutors"
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
+              className="px-4 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
@@ -60,32 +96,75 @@ export default function Header() {
             </Link>
             <Link 
               href="/about" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
+              className="px-4 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
               About
             </Link>
-               <Link 
-              href="/add-kuppi" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              Add Kuppi
-            </Link>
+
+            {/* Auth Section */}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : user ? (
+              <>
+                <Link 
+                  href="/add-kuppi" 
+                  className="px-4 py-2 rounded-full font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 
+                             hover:from-purple-700 hover:to-blue-700 shadow-md
+                             transition-all duration-500 ease-in-out transform hover:scale-105"
+                >
+                  Add Kuppi
+                </Link>
+                <IconButton onClick={handleProfileClick} sx={{ p: 0, ml: 1 }}>
+                  <Avatar 
+                    src={userProfile?.photo_url || undefined}
+                    sx={{ width: 36, height: 36, bgcolor: 'primary.main' }}
+                  >
+                    {userProfile?.display_name?.[0] || user.email?.[0]?.toUpperCase()}
+                  </Avatar>
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                  onClick={handleClose}
+                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                  <MenuItem onClick={() => router.push('/dashboard')}>
+                    <ListItemIcon>
+                      <DashboardIcon fontSize="small" />
+                    </ListItemIcon>
+                    Dashboard
+                  </MenuItem>
+                  <MenuItem onClick={() => router.push('/profile')}>
+                    <ListItemIcon>
+                      <PersonIcon fontSize="small" />
+                    </ListItemIcon>
+                    Profile
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                      <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Link 
+                href="/login" 
+                className="px-4 py-2 rounded-full font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 
+                           hover:from-purple-700 hover:to-blue-700 shadow-md flex items-center gap-2
+                           transition-all duration-500 ease-in-out transform hover:scale-105"
+              >
+                <LoginIcon fontSize="small" />
+                Login
+              </Link>
+            )}
           </div>
-
-          {/* Placeholder for search (can be added later) */}
-         
-       
-             
-              <HeaderSearch />
-             
-           
-            {/* Search component will be added here later */}
-         
-
 
           {/* Mobile menu button */}
           <button
@@ -111,7 +190,7 @@ export default function Header() {
         >
           
           <div className="p-4 space-y-4 transition-opacity duration-500">
-            {['Home',  'Tutors', 'About', 'Add-Kuppi'].map((item, i) => (
+            {['Home', 'Search', 'Tutors', 'About'].map((item, i) => (
               <Link
                 key={i}
                 href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
@@ -123,12 +202,45 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Placeholder for mobile search (can be added later) */}
-               
-            <div className="mt-2">
-             
-              {/* Mobile search component will be added here later */}
-            </div>
+            {user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-blue-800 font-semibold border border-blue-200 rounded-lg px-4 py-2 
+                             hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/add-kuppi"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-white font-semibold bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg px-4 py-2 
+                             hover:from-purple-700 hover:to-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  Add Kuppi
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-left text-red-600 font-semibold border border-red-200 rounded-lg px-4 py-2 
+                             hover:bg-red-600 hover:text-white transition-all duration-300 ease-in-out"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-white font-semibold bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg px-4 py-2 
+                           hover:from-purple-700 hover:to-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </nav>
