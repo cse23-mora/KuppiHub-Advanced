@@ -286,8 +286,8 @@ const toggleFAQ = (categoryIndex: number, faqIndex: number) => {
               Still Have Questions?
             </h2>
             <p className="text-green-100 mb-6 leading-relaxed">
-              Can't find what you're looking for? Our team is always happy to help! 
-              We're students too, so we totally get it.
+              Can&apos;t find what you&apos;re looking for? Our team is always happy to help! 
+              We&apos;re students too, so we totally get it.
             </p>
             
             <div className="grid gap-4 md:grid-cols-3 mb-6">
@@ -311,8 +311,8 @@ const toggleFAQ = (categoryIndex: number, faqIndex: number) => {
             <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
               <h3 className="font-bold mb-2">Response Time Promise 🕐</h3>
               <p className="text-green-100 text-sm">
-                We usually respond within 24-48 hours. Remember, we're students too, 
-                so sometimes we might be buried in our own exams! But we'll definitely get back to you.
+                We usually respond within 24-48 hours. Remember, we&apos;re students too, 
+                so sometimes we might be buried in our own exams! But we&apos;ll definitely get back to you.
               </p>
             </div>
           </div>
@@ -370,7 +370,7 @@ const toggleFAQ = (categoryIndex: number, faqIndex: number) => {
           <div className="bg-gradient-to-r from-blue-400 to-indigo-600 text-white p-8 rounded-xl shadow-xl">
             <h2 className="text-2xl font-bold mb-4">Ready to Join the Kuppi Revolution? 🚀</h2>
             <p className="text-blue-100 mb-6">
-              Whether you're here to learn or teach (or both!), welcome to the family!
+              Whether you&apos;re here to learn or teach (or both!), welcome to the family!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-lg border border-white/20">
@@ -384,7 +384,7 @@ const toggleFAQ = (categoryIndex: number, faqIndex: number) => {
               </div>
             </div>
             <p className="text-blue-200 text-sm mt-6 italic">
-              "Because together we learn, together we grow, together we build Sri Lanka's future!" 🇱🇰
+              &quot;Because together we learn, together we grow, together we build Sri Lanka&apos;s future!&quot; 🇱🇰
             </p>
           </div>
         </motion.div>
