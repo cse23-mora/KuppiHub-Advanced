@@ -3,6 +3,7 @@ import supabase from '../../../lib/supabase';
 export async function GET() {
   try {
     // Fetch all students with related info
+    // Only count videos that are approved and not hidden
     const { data, error } = await supabase
       .from('students')
       .select(`
@@ -13,18 +14,23 @@ export async function GET() {
         linkedin_url,
         faculty:faculties(name),
         department:departments(name),
-        videos:videos(id, title, module_id, modules(name))
+        videos:videos!inner(id, title, module_id, is_approved, is_hidden, modules(name))
       `)
       .neq('name', 'Unknown');  // filter out students with name = 'Unknown'
 
     if (error) throw error;
 
-    // Map to get number of videos and unique module names
+    // Map to get number of visible/approved videos and unique module names
     const students = data
       .map(student => {
+        // Filter videos to only count approved and visible ones
+        const visibleVideos = (student.videos || []).filter(
+          v => v.is_approved === true && v.is_hidden !== true
+        );
+
         const moduleNames = Array.from(
           new Set(
-            (student.videos || [])
+            visibleVideos
               .map(v => v.modules?.name)
               .filter(Boolean)
           )
@@ -41,11 +47,11 @@ export async function GET() {
           linkedin_url: student.linkedin_url,
           faculty: student.faculty?.name || null,
           department: student.department?.name || null,
-          video_count: (student.videos || []).length,
+          video_count: visibleVideos.length,
           modules_done: moduleNames,
         };
       })
-      .filter(student => student.video_count > 0); // only include students with at least 1 video
+      .filter(student => student.video_count > 0); // only include students with at least 1 visible video
 
     return new Response(JSON.stringify({ students }), { status: 200 });
   } catch (err) {

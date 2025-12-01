@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
         material_urls,
         is_kuppi,
         is_hidden,
+        is_approved,
         language_code,
         created_at,
         published_at,
