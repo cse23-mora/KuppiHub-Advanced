@@ -3,24 +3,21 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Faculty from "./faculty/page";
 
 export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // client-only check to see if user chose auto-redirect previously
-    if (typeof window === "undefined") return;
-
-    const savedPref = localStorage.getItem("autoRedirectModules");
-    const lastURL = localStorage.getItem("lastModuleURL");
-
-    if (savedPref === "true" && lastURL) {
-      // use replace so "/" doesn't stay in history (optional)
-      router.replace(lastURL);
-    }
+    // Redirect to dashboard
+    router.replace("/dashboard");
   }, [router]);
 
-  // render Faculty as before — checkbox & preference lives in modules page
-  return <Faculty />;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecting to dashboard...</p>
+      </div>
+    </div>
+  );
 }

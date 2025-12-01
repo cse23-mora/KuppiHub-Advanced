@@ -10,6 +10,8 @@ export async function GET(req) {
       return NextResponse.json({ error: "moduleId is required" }, { status: 400 });
     }
 
+    // Fetch videos - only show visible and approved kuppis
+    // Filter: is_hidden = false AND is_approved = true
     const { data, error } = await supabase
       .from('videos')
       .select(`
@@ -18,7 +20,8 @@ export async function GET(req) {
         youtube_links,
         telegram_links,
         material_urls,
-        cloud_video_urls,
+        onedrive_cloud_video_urls,
+        gdrive_cloud_video_urls,
         is_kuppi,
         description,
         language_code,
@@ -31,6 +34,8 @@ export async function GET(req) {
         )
       `)
       .eq('module_id', Number(moduleId))
+      .eq('is_hidden', false)
+      .eq('is_approved', true)
       .order('created_at', { ascending: false });
 
     if (error) {

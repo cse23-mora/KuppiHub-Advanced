@@ -10,7 +10,8 @@ interface Video {
   youtube_links: string[];
   telegram_links?: string[];
   material_urls?: string[];
-  cloud_video_urls?: string[];
+  onedrive_cloud_video_urls?: string[];
+  gdrive_cloud_video_urls?: string[];
   is_kuppi?: boolean;
   description?: string;
   language_code?: string;
@@ -173,7 +174,7 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
 
 
 
-            {video.cloud_video_urls?.map((link, index) => (
+            {video.onedrive_cloud_video_urls?.map((link, index) => (
             <motion.a
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -188,7 +189,28 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
               className=" h-5 mr-2"
               alt="OneDrive"
               />
-              OneDrive Video {video.cloud_video_urls!.length > 1 ? index + 1 : ""}
+              OneDrive Video {video.onedrive_cloud_video_urls!.length > 1 ? index + 1 : ""}
+            </motion.a>
+            ))}
+
+            {video.gdrive_cloud_video_urls?.map((link, index) => (
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              key={`gdrive-${index}`}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M4.433 22l3.088-5.333H22l-3.088 5.333H4.433zm7.134-12L7.6 2h7.467l3.967 8H11.567zm-1.7 2.933L2 22l3.967-6.867L13.833 2l3.967 6.867-7.966 4.066z" />
+              </svg>
+              Google Drive Video {video.gdrive_cloud_video_urls!.length > 1 ? index + 1 : ""}
             </motion.a>
             ))}
 

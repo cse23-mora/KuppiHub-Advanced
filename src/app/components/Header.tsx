@@ -2,9 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import HeaderSearch from '../dashboard/components/HeaderSearch';
+import HeaderSearch from './HeaderSearch';
+import { useAuth } from '@/contexts/AuthContext';
+import Image from 'next/image';
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, loading, signOut } = useAuth();
 
   return (
     <header className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-white">
@@ -35,21 +40,13 @@ export default function Header() {
           {/* Desktop Nav */}
           <div className="hidden sm:flex items-center space-x-6">
             <Link 
-              href="/" 
+              href="/dashboard"
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
                          transition-all duration-500 ease-in-out transform hover:scale-105"
             >
-              Home
+              Dashboard
             </Link>
-            {/* <Link 
-              href="/semesters" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              Semesters
-            </Link> */}
             <Link 
               href="/tutors"
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
@@ -59,14 +56,6 @@ export default function Header() {
               Tutors
             </Link>
             <Link 
-              href="/about" 
-              className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
-                         hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
-                         transition-all duration-500 ease-in-out transform hover:scale-105"
-            >
-              About
-            </Link>
-               <Link 
               href="/add-kuppi" 
               className="px-5 py-2 rounded-full font-bold text-blue-800 bg-white border border-blue-300 shadow-sm 
                          hover:bg-blue-700 hover:text-white hover:shadow-md hover:border-blue-700
@@ -85,7 +74,77 @@ export default function Header() {
            
             {/* Search component will be added here later */}
          
-
+          {/* Auth Button */}
+          <div className="hidden sm:flex items-center ml-4">
+            {loading ? (
+              <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+            ) : user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center space-x-2 focus:outline-none"
+                >
+                  {user.photoURL ? (
+                    <Image
+                      src={user.photoURL}
+                      alt={user.displayName || 'User'}
+                      width={36}
+                      height={36}
+                      className="rounded-full border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer">
+                      {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
+                </button>
+                
+                {/* Profile Dropdown */}
+                {isProfileOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setIsProfileOpen(false)}
+                    ></div>
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-800 truncate">
+                          {user.displayName || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          signOut();
+                          setIsProfileOpen(false);
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="font-medium">Logout</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-4 py-2 rounded-full font-bold text-green-700 bg-white border border-green-300 shadow-sm 
+                           hover:bg-green-600 hover:text-white hover:shadow-md hover:border-green-600
+                           transition-all duration-500 ease-in-out transform hover:scale-105 flex items-center space-x-2 text-sm"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>Login</span>
+              </Link>
+            )}
+          </div>
 
           {/* Mobile menu button */}
           <button
@@ -111,15 +170,15 @@ export default function Header() {
         >
           
           <div className="p-4 space-y-4 transition-opacity duration-500">
-            {['Home',  'Tutors', 'About', 'Add-Kuppi'].map((item, i) => (
+            {['Dashboard', 'Tutors', 'Add-Kuppi'].map((item, i) => (
               <Link
                 key={i}
-                href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                href={`/${item.toLowerCase()}`}
                 onClick={() => setIsMenuOpen(false)}
                 className="block text-blue-800 font-semibold border border-blue-200 rounded-lg px-4 py-2 
                            hover:bg-blue-600 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105"
               >
-                {item}
+                {item === 'Add-Kuppi' ? 'Add Kuppi' : item}
               </Link>
             ))}
 
@@ -129,6 +188,48 @@ export default function Header() {
              
               {/* Mobile search component will be added here later */}
             </div>
+
+            {/* Mobile Auth Button */}
+            {loading ? (
+              <div className="w-full h-10 rounded-lg bg-gray-200 animate-pulse"></div>
+            ) : user ? (
+              <div className="flex items-center justify-between border border-red-200 rounded-lg px-4 py-2">
+                <div className="flex items-center space-x-3">
+                  {user.photoURL ? (
+                    <Image
+                      src={user.photoURL}
+                      alt={user.displayName || 'User'}
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                      {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <span className="text-gray-700 text-sm truncate max-w-[150px]">{user.displayName || user.email}</span>
+                </div>
+                <button
+                  onClick={() => { signOut(); setIsMenuOpen(false); }}
+                  className="text-red-600 font-semibold text-sm hover:text-red-800"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full flex items-center justify-center space-x-2 text-green-700 font-semibold border border-green-200 rounded-lg px-4 py-2 
+                           hover:bg-green-600 hover:text-white transition-all duration-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
