@@ -9,6 +9,7 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import CloudIcon from "@mui/icons-material/Cloud";
 import FolderIcon from "@mui/icons-material/Folder";
+import { validateLinkUrl } from "@/lib/validation";
 import { LinkCategory } from "./types";
 
 interface LinkEditorProps {
@@ -69,6 +70,14 @@ export default function LinkEditor({
   const config = categoryConfig[category];
   const Icon = config.icon;
 
+  const handleUrlChange = (index: number, value: string) => {
+    const validation = validateLinkUrl(value);
+    if (validation.valid) {
+      onUpdate(index, value);
+    }
+    // If invalid, we don't update the value, silently reject the invalid characters
+  };
+
   return (
     <div className="space-y-2 sm:space-y-3">
       <div className="flex items-center justify-between">
@@ -102,8 +111,9 @@ export default function LinkEditor({
               size="small"
               placeholder={config.placeholder}
               value={link}
-              onChange={(e) => onUpdate(index, e.target.value)}
+              onChange={(e) => handleUrlChange(index, e.target.value)}
               disabled={disabled}
+              helperText="Links cannot contain double quotes or commas"
               sx={{
                 "& .MuiInputBase-input": {
                   fontSize: { xs: "0.75rem", sm: "0.875rem" },

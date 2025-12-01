@@ -12,7 +12,10 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Divider from "@mui/material/Divider";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
 import AddIcon from "@mui/icons-material/Add";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   PageHeader,
   InfoCard,
@@ -32,6 +35,7 @@ export default function AddKuppiPage() {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   
   // Module search state
   const [moduleSearch, setModuleSearch] = useState("");
@@ -141,6 +145,7 @@ export default function AddKuppiPage() {
       }
 
       setSubmitStatus({ type: "success", message: "Your Kuppi has been submitted successfully! It will be reviewed and published soon." });
+      setShowSuccessDialog(true);
       setFormData(initialFormData);
       setSelectedModule(null);
       setModuleSearch("");
@@ -164,6 +169,10 @@ export default function AddKuppiPage() {
   if (!user) {
     return null;
   }
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
+  };
 
   return (
     <div className="min-h-screen py-4 sm:py-6 md:py-8 px-3 sm:px-4 bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -305,6 +314,71 @@ export default function AddKuppiPage() {
           </Link>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={showSuccessDialog}
+        onClose={handleSuccessDialogClose}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      >
+        <DialogContent sx={{ textAlign: "center", py: 4, px: 3 }}>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          >
+            <CheckCircleIcon
+              sx={{
+                fontSize: 60,
+                color: "#10b981",
+                mb: 2,
+              }}
+            />
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl font-semibold text-gray-800 mb-1"
+          >
+            Added Successfully!
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-sm text-gray-600 mb-4"
+          >
+            Your kuppi has been submitted and will be reviewed soon.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Button
+              onClick={handleSuccessDialogClose}
+              variant="contained"
+              sx={{
+                background: "linear-gradient(to right, #3b82f6, #6366f1)",
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 600,
+                px: 4,
+              }}
+            >
+              Done
+            </Button>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

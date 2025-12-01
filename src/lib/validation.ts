@@ -128,6 +128,7 @@ export function isValidOnedriveUrl(url: string): boolean {
 
 /**
  * Validate an array of URLs and return only valid ones
+ * Rejects URLs containing double quotes or commas
  */
 export function validateUrlArray(
   urls: unknown,
@@ -141,6 +142,11 @@ export function validateUrlArray(
     .filter((url): url is string => typeof url === "string")
     .map(url => url.trim())
     .filter(url => {
+      // Reject URLs with double quotes or commas
+      if (url.includes('"') || url.includes(',')) {
+        return false;
+      }
+      
       const validatedUrl = validateUrl(url);
       if (!validatedUrl) return false;
       if (validator && !validator(validatedUrl)) return false;
@@ -216,4 +222,25 @@ export function validateDescription(description: string): { valid: boolean; sani
 export function validateLanguageCode(code: string): boolean {
   const validCodes = ["en", "si", "ta", "mix"];
   return validCodes.includes(code);
+}
+
+/**
+ * Validate link URL - reject if contains double quotes or commas
+ */
+export function validateLinkUrl(url: string): { valid: boolean; error?: string } {
+  if (!url) {
+    return { valid: true }; // Empty is okay, will be filtered on submit
+  }
+
+  // Check for double quotes
+  if (url.includes('"')) {
+    return { valid: false, error: 'Links cannot contain double quotes (")' };
+  }
+
+  // Check for commas
+  if (url.includes(',')) {
+    return { valid: false, error: 'Links cannot contain commas (,)' };
+  }
+
+  return { valid: true };
 }

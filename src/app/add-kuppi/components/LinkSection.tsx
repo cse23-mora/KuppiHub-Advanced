@@ -10,6 +10,7 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import CloudIcon from "@mui/icons-material/Cloud";
 import FolderIcon from "@mui/icons-material/Folder";
+import { validateLinkUrl } from "@/lib/validation";
 import { LinkItem } from "./types";
 
 interface LinkSectionProps {
@@ -72,6 +73,14 @@ export default function LinkSection({
 }: LinkSectionProps) {
   const { title, icon: Icon, color, bgColor, borderColor, placeholder } = config[type];
 
+  const handleUrlChange = (id: string, value: string) => {
+    const validation = validateLinkUrl(value);
+    if (validation.valid) {
+      onUpdate(id, value);
+    }
+    // If invalid, we don't update the value, silently reject the invalid characters
+  };
+
   return (
     <Paper
       elevation={0}
@@ -119,8 +128,9 @@ export default function LinkSection({
                 fullWidth
                 size="small"
                 value={link.url}
-                onChange={(e) => onUpdate(link.id, e.target.value)}
+                onChange={(e) => handleUrlChange(link.id, e.target.value)}
                 placeholder={placeholder}
+                helperText="Links cannot contain double quotes or commas"
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 2,
