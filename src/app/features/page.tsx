@@ -316,8 +316,8 @@ const Features = () => {
             </p>
             <div className="bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-lg">
               <p className="text-blue-500 font-medium">
-                "Empowering Sri Lankan students to face the future world as knowledgeable, 
-                united, and unstoppable individuals who lift each other up!"
+                &quot;Empowering Sri Lankan students to face the future world as knowledgeable, 
+                united, and unstoppable individuals who lift each other up!&quot;
               </p>
             </div>
           </div>
@@ -334,7 +334,7 @@ const Features = () => {
           <div className="bg-gradient-to-r from-green-500 to-blue-400 text-white p-8 rounded-xl shadow-xl">
             <h2 className="text-2xl font-bold mb-4">Ready to Join the Revolution? 🚀</h2>
             <p className="text-green-100 mb-6">
-              Whether you need help or want to help others - there's a place for you in Kuppi Hub!
+              Whether you need help or want to help others - there&apos;s a place for you in Kuppi Hub!
             </p>
       <div className="space-y-4">
   {/* Email */}
@@ -363,7 +363,7 @@ const Features = () => {
 
   {/* GitHub */}
   <p className="text-green-100 text-sm italic">
-    P.S: We're open source on{" "}
+    P.S: We&apos;re open source on{" "}
     <a
       href="https://github.com/cse23-mora"
       target="_blank"

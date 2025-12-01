@@ -16,6 +16,8 @@ export async function GET(req) {
     .from("videos_search_mv")
     .select("*")
     .or(ilikeQuery)
+    .eq("is_hidden", false)
+    .eq("is_approved", true)
     .limit(20);
 
   if (error) {
