@@ -2,19 +2,54 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import VideoPlayer from "../../../components/VideoPlayer";
+import { useMemo } from "react";
+
+interface VideoData {
+  videoUrl: string;
+  videoTitle?: string;
+  description?: string;
+  studentName?: string;
+}
 
 export default function WatchVideoPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const raw = searchParams.get("videoUrl") || "";
-  const videoTitle = searchParams.get("videoTitle") || undefined;
   
-  let videoUrl = raw;
-  try { videoUrl = decodeURIComponent(raw); } catch { /* ignore */ }
+  // Decode base64 data from URL
+  const videoData = useMemo<VideoData | null>(() => {
+    const data = searchParams.get("data");
+    
+    if (data) {
+      try {
+        const decoded = atob(data);
+        return JSON.parse(decoded) as VideoData;
+      } catch (error) {
+        console.error("Failed to decode video data:", error);
+        return null;
+      }
+    }
+    
+    // Fallback for old URL format (backward compatibility)
+    const videoUrl = searchParams.get("videoUrl");
+    const videoTitle = searchParams.get("videoTitle");
+    
+    if (videoUrl) {
+      try {
+        return {
+          videoUrl: decodeURIComponent(videoUrl),
+          videoTitle: videoTitle ? decodeURIComponent(videoTitle) : undefined,
+        };
+      } catch {
+        return { videoUrl };
+      }
+    }
+    
+    return null;
+  }, [searchParams]);
 
   const handleBack = () => router.back();
 
-  if (!videoUrl) {
+  if (!videoData?.videoUrl) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
         No video URL provided
@@ -24,9 +59,11 @@ export default function WatchVideoPage() {
 
   return (
     <VideoPlayer 
-      key={videoUrl}
-      videoUrl={videoUrl} 
-      videoTitle={videoTitle} 
+      key={videoData.videoUrl}
+      videoUrl={videoData.videoUrl} 
+      videoTitle={videoData.videoTitle} 
+      description={videoData.description}
+      studentName={videoData.studentName}
       onBack={handleBack}
     />
   );

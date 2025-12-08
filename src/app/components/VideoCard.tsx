@@ -115,30 +115,40 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
       </div>
 
       <div className="space-y-3">
-        {video.youtube_links.map((url, index) => (
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            key={`url-${index}`}
-            onClick={() =>
-              router.push(
-                `/module-kuppi/${moduleId}/watch?videoUrl=${encodeURIComponent(url)}&videoTitle=${encodeURIComponent(video.title)}`
-              )
-            }
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-red-500 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
-          >
-         <svg
-  className="w-5 h-5 mr-2"
-  fill="currentColor"
-  viewBox="0 0 24 24"
-  aria-hidden="true"
->
-  <path d="M23.498 6.186a2.974 2.974 0 0 0-2.094-2.103C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.404.583a2.974 2.974 0 0 0-2.094 2.103C0 8.09 0 12 0 12s0 3.91.502 5.814a2.974 2.974 0 0 0 2.094 2.103C4.495 20.5 12 20.5 12 20.5s7.505 0 9.404-.583a2.974 2.974 0 0 0 2.094-2.103C24 15.91 24 12 24 12s0-3.91-.502-5.814zM9.75 15.568V8.432L15.818 12 9.75 15.568z" />
-</svg>
-
-            Watch Video From Youtube{video.youtube_links.length > 1 ? index + 1 : ""}
-          </motion.button>
-        ))}
+        {video.youtube_links.map((url, index) => {
+          // Create video data object and encode as base64
+          const videoData = {
+            videoUrl: url,
+            videoTitle: video.title,
+            description: video.description || '',
+            studentName: video.owner?.name || '',
+          };
+          const encodedData = btoa(JSON.stringify(videoData));
+          
+          return (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              key={`url-${index}`}
+              onClick={() =>
+                router.push(
+                  `/module-kuppi/${moduleId}/watch?data=${encodedData}`
+                )
+              }
+              className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-red-500 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M23.498 6.186a2.974 2.974 0 0 0-2.094-2.103C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.404.583a2.974 2.974 0 0 0-2.094 2.103C0 8.09 0 12 0 12s0 3.91.502 5.814a2.974 2.974 0 0 0 2.094 2.103C4.495 20.5 12 20.5 12 20.5s7.505 0 9.404-.583a2.974 2.974 0 0 0 2.094-2.103C24 15.91 24 12 24 12s0-3.91-.502-5.814zM9.75 15.568V8.432L15.818 12 9.75 15.568z" />
+              </svg>
+              Watch Video From Youtube{video.youtube_links.length > 1 ? ` ${index + 1}` : ""}
+            </motion.button>
+          );
+        })}
 
         <div className="flex flex-wrap gap-2">
           {video.telegram_links?.map((link, index) => (

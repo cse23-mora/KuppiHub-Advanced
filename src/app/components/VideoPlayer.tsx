@@ -1,17 +1,20 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import 'video.js/dist/video-js.css';
-
 interface VideoPlayerProps {
   videoUrl: string;
   videoTitle?: string;
+  description?: string;
+  studentName?: string;
   onBack?: () => void;
 }
 
-export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlayerProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>(null);
+export default function VideoPlayer({ 
+  videoUrl, 
+  videoTitle, 
+  description, 
+  studentName, 
+  onBack 
+}: VideoPlayerProps) {
 
   const extractYouTubeId = (url: string): string | null => {
     if (!url) return null;
@@ -43,100 +46,20 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
     return null;
   };
 
-  useEffect(() => {
-    if (!videoUrl || !containerRef.current) return;
-
-    const initPlayer = async () => {
-      try {
-        // Import video.js dynamically
-        const videojsModule = await import('video.js');
-        const videojs = videojsModule.default || videojsModule;
-        
-        // Import YouTube plugin
-        await import('videojs-youtube');
-
-        // Dispose existing player
-        if (playerRef.current) {
-          playerRef.current.dispose();
-          playerRef.current = null;
-        }
-
-        // Create video element
-        const videoElement = document.createElement('video');
-        videoElement.className = 'video-js vjs-default-skin vjs-big-play-centered';
-        videoElement.setAttribute('controls', '');
-        videoElement.setAttribute('preload', 'auto');
-        videoElement.setAttribute('width', '480');
-        videoElement.setAttribute('height', '270');
-
-        // Clear container and add video element
-        if (containerRef.current) {
-          containerRef.current.innerHTML = '';
-          containerRef.current.appendChild(videoElement);
-        } else {
-          return;
-        }
-
-        const youtubeId = extractYouTubeId(videoUrl);
-
-        // Configure player based on video type
-        const playerOptions: any = {
-          controls: true,
-          autoplay: false,
-          preload: 'auto',
-          responsive: true,
-          fluid: true,
-          playbackRates: [ 1, 1.25, 1.5, 1.75, 2],
-        };
-
-        if (youtubeId) {
-          // YouTube video
-        //   playerOptions.techOrder = ['youtube'];
-          playerOptions.sources = [
-            {
-              src: `https://www.youtube.com/watch?v=${youtubeId}`,
-              type: 'video/youtube',
-            },
-          ];
-        } else {
-          // HTML5 video
-          playerOptions.sources = [
-            {
-              src: videoUrl,
-              type: 'video/mp4',
-            },
-          ];
-        }
-
-        // Initialize player
-        playerRef.current = videojs(videoElement, playerOptions, function onPlayerReady() {
-          console.log('Video player ready');
-        });
-
-      } catch (error) {
-        console.error('Error initializing video player:', error);
-      }
-    };
-
-    initPlayer();
-
-    // Cleanup
-    return () => {
-      if (playerRef.current && typeof playerRef.current.dispose === 'function') {
-        try {
-          playerRef.current.dispose();
-          playerRef.current = null;
-        } catch (e) {
-          console.error('Error disposing player:', e);
-        }
-      }
-    };
-  }, [videoUrl]);
-
   if (!videoUrl) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
         No video URL provided
+      </div>
+    );
+  }
+
+  const youtubeId = extractYouTubeId(videoUrl);
+
+  if (!youtubeId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        Invalid YouTube URL
       </div>
     );
   }
@@ -146,9 +69,12 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
       {onBack && (
         <button
           onClick={onBack}
-          className="mb-6 px-4 py-2 bg-white rounded shadow hover:bg-gray-100 transition-colors"
+          className="mb-6 px-4 py-2 bg-white rounded shadow hover:bg-gray-100 transition-colors flex items-center gap-2"
         >
-          ← Back
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
         </button>
       )}
 
@@ -157,8 +83,43 @@ export default function VideoPlayer({ videoUrl, videoTitle, onBack }: VideoPlaye
           <h1 className="text-2xl font-bold text-gray-800 mb-4">{videoTitle}</h1>
         )}
         
-        <div style={{ maxWidth: '480px', margin: '0 auto' }}>
-          <div ref={containerRef} style={{ aspectRatio: '16/9' }} />
+        {/* YouTube Embed */}
+        <div className="w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black">
+          <iframe
+            src={`https://www.youtube.com/embed/${youtubeId}?rel=0&modestbranding=1`}
+            title={videoTitle || 'YouTube Video'}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="w-full h-full"
+          />
+        </div>
+
+        {/* Video Info Section */}
+        <div className="mt-6 bg-white rounded-xl shadow-md p-6">
+          {studentName && (
+            <div className="flex items-center gap-3 mb-4 p-3 bg-blue-50 rounded-lg">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Done by</p>
+                <p className="font-semibold text-gray-800">{studentName}</p>
+              </div>
+            </div>
+          )}
+
+          {description && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Description</h3>
+              <p className="text-gray-600 whitespace-pre-line">{description}</p>
+            </div>
+          )}
+
+          {!studentName && !description && (
+            <p className="text-gray-500 text-center">No additional information available</p>
+          )}
         </div>
       </div>
     </div>
