@@ -20,13 +20,14 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [justSignedUp, setJustSignedUp] = useState(false);
 
-  // Redirect if already logged in
+  // Redirect if already logged in (but not if just signed up and needs verification)
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && !justSignedUp && mode !== "verify-email") {
       router.push("/dashboard");
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, justSignedUp, mode]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -76,8 +77,10 @@ export default function LoginPage() {
           setIsSubmitting(false);
           return;
         }
+        // Set justSignedUp BEFORE calling signUpWithEmail to prevent redirect
+        setJustSignedUp(true);
         await signUpWithEmail(email, password, displayName);
-        // Show verification message instead of redirecting
+        // Show verification message
         setMode("verify-email");
         setSuccess("Account created! Please check your email to verify your account before signing in.");
       } else if (mode === "reset") {
@@ -86,6 +89,8 @@ export default function LoginPage() {
         setMode("login");
       }
     } catch (err: unknown) {
+      // Reset justSignedUp on error
+      setJustSignedUp(false);
       const error = err as { code?: string; message?: string };
       // Handle Firebase auth errors with user-friendly messages
       switch (error.code) {
@@ -122,6 +127,10 @@ export default function LoginPage() {
     setMode(newMode);
     setError("");
     setSuccess("");
+    // Reset justSignedUp when switching to login mode
+    if (newMode === "login") {
+      setJustSignedUp(false);
+    }
   };
 
   if (loading) {
@@ -132,7 +141,7 @@ export default function LoginPage() {
     );
   }
 
-  if (user) {
+  if (user && !justSignedUp && mode !== "verify-email") {
     return null; // Will redirect
   }
 
@@ -312,7 +321,7 @@ export default function LoginPage() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 
                          focus:border-transparent transition-all duration-200 text-gray-900"
-                placeholder="you@example.com"
+                placeholder="youremail@uom.lk"
               />
             </div>
 
