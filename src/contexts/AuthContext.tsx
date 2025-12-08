@@ -12,12 +12,13 @@ import {
   sendEmailVerification,
   updateProfile
 } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase';
+import { auth, googleProvider, githubProvider } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithGithub: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
@@ -28,7 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Helper function to sync user with Supabase
-async function syncUserToSupabase(firebaseUser: User, authProvider: 'google' | 'email'): Promise<boolean> {
+async function syncUserToSupabase(firebaseUser: User, authProvider: 'google' | 'github' | 'email'): Promise<boolean> {
   try {
     const response = await fetch('/api/users', {
       method: 'POST',
@@ -68,7 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Sync verified users to Supabase on auth state change
       if (user && user.emailVerified) {
-        const provider = user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email';
+        const providerId = user.providerData[0]?.providerId;
+        let provider: 'google' | 'github' | 'email' = 'email';
+        if (providerId === 'google.com') {
+          provider = 'google';
+        } else if (providerId === 'github.com') {
+          provider = 'github';
+        }
         await syncUserToSupabase(user, provider);
       }
     });
@@ -83,6 +90,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await syncUserToSupabase(result.user, 'google');
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      throw error;
+    }
+  };
+
+  const signInWithGithub = async () => {
+    try {
+      const result = await signInWithPopup(auth, githubProvider);
+      // GitHub users are always verified, sync to Supabase
+      await syncUserToSupabase(result.user, 'github');
+    } catch (error) {
+      console.error('Error signing in with GitHub:', error);
       throw error;
     }
   };
@@ -163,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, resendVerificationEmail, resetPassword, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithGithub, signInWithEmail, signUpWithEmail, resendVerificationEmail, resetPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   );
