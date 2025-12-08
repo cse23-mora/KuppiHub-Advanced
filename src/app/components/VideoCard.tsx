@@ -18,9 +18,6 @@ interface Video {
   created_at?: string;
   owner?: {
     name: string;
-    department: {
-      name: string;
-    };
   };
 }
 
@@ -100,11 +97,6 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
           </div>
           <div>
             <p className="font-medium text-gray-800">{video.owner.name}</p>
-       {video.owner.department?.name && (
-  <p className="text-xs text-gray-500">
-    Department of {video.owner.department.name}
-  </p>
-)}
           </div>
         </div>
       )}

@@ -27,10 +27,7 @@ export async function GET(req) {
         language_code,
         created_at,
         owner:students(
-          name,
-          department:departments(
-            name
-          )
+          name
         )
       `)
       .eq('module_id', Number(moduleId))
