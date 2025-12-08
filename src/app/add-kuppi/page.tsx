@@ -16,6 +16,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import AddIcon from "@mui/icons-material/Add";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import NewTutorCard from "./components/NewTutorCard";
 import {
   PageHeader,
   InfoCard,
@@ -317,6 +318,8 @@ export default function AddKuppiPage() {
           </Card>
         </motion.div>
 
+        <NewTutorCard />
+
         {/* Back Link */}
         <div className="text-center mt-4 sm:mt-6">
           <Link href="/" className="text-gray-600 hover:text-gray-800 text-xs sm:text-sm">
@@ -389,6 +392,8 @@ export default function AddKuppiPage() {
           </motion.div>
         </DialogContent>
       </Dialog>
+
+
     </div>
   );
 }
