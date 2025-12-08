@@ -9,7 +9,16 @@ import Image from 'next/image';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { user, loading, signOut } = useAuth();
+  const { user, supabaseUser, loading, signOut } = useAuth();
+
+  // Verified badge component for approved tutors
+  const VerifiedBadge = () => (
+    <div className="absolute -bottom-0.5 -right-0.5 bg-blue-500 rounded-full p-0.5 border-2 border-white">
+      <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+      </svg>
+    </div>
+  );
 
   return (
     <header className="bg-gradient-to-r from-blue-100 via-purple-200 to-blue-500 text-white">
@@ -84,19 +93,22 @@ export default function Header() {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center space-x-2 focus:outline-none"
                 >
-                  {user.photoURL ? (
-                    <Image
-                      src={user.photoURL}
-                      alt={user.displayName || 'User'}
-                      width={36}
-                      height={36}
-                      className="rounded-full border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer">
-                      {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
-                    </div>
-                  )}
+                  <div className="relative">
+                    {user.photoURL ? (
+                      <Image
+                        src={user.photoURL}
+                        alt={user.displayName || 'User'}
+                        width={36}
+                        height={36}
+                        className="rounded-full border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm border-2 border-white shadow-sm hover:border-blue-400 transition-all cursor-pointer">
+                        {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    {supabaseUser?.is_approved_for_kuppies && <VerifiedBadge />}
+                  </div>
                 </button>
                 
                 {/* Profile Dropdown */}
@@ -108,9 +120,19 @@ export default function Header() {
                     ></div>
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-800 truncate">
-                          {user.displayName || 'User'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-gray-800 truncate">
+                            {user.displayName || 'User'}
+                          </p>
+                          {supabaseUser?.is_approved_for_kuppies && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              Tutor
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500 truncate">
                           {user.email}
                         </p>
@@ -195,20 +217,34 @@ export default function Header() {
             ) : user ? (
               <div className="flex items-center justify-between border border-red-200 rounded-lg px-4 py-2">
                 <div className="flex items-center space-x-3">
-                  {user.photoURL ? (
-                    <Image
-                      src={user.photoURL}
-                      alt={user.displayName || 'User'}
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                      {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                  <div className="relative">
+                    {user.photoURL ? (
+                      <Image
+                        src={user.photoURL}
+                        alt={user.displayName || 'User'}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
+                        {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    {supabaseUser?.is_approved_for_kuppies && <VerifiedBadge />}
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-700 text-sm truncate max-w-[120px]">{user.displayName || user.email}</span>
+                      {supabaseUser?.is_approved_for_kuppies && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                          <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                      )}
                     </div>
-                  )}
-                  <span className="text-gray-700 text-sm truncate max-w-[150px]">{user.displayName || user.email}</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => { signOut(); setIsMenuOpen(false); }}

@@ -14,8 +14,23 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, githubProvider } from '@/lib/firebase';
 
+// Supabase user interface
+interface SupabaseUser {
+  id: string;
+  firebase_uid: string;
+  email: string;
+  display_name: string | null;
+  photo_url: string | null;
+  is_verified: boolean;
+  auth_provider: string;
+  is_approved_for_kuppies: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuthContextType {
   user: User | null;
+  supabaseUser: SupabaseUser | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithGithub: () => Promise<void>;
@@ -28,8 +43,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper function to sync user with Supabase
-async function syncUserToSupabase(firebaseUser: User, authProvider: 'google' | 'github' | 'email'): Promise<boolean> {
+// Helper function to sync user with Supabase and return user data
+async function syncUserToSupabase(firebaseUser: User, authProvider: 'google' | 'github' | 'email'): Promise<SupabaseUser | null> {
   try {
     const response = await fetch('/api/users', {
       method: 'POST',
@@ -47,37 +62,66 @@ async function syncUserToSupabase(firebaseUser: User, authProvider: 'google' | '
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Failed to sync user to Supabase:', errorData);
-      return false;
+      return null;
     }
     
+    const data = await response.json();
     console.log('User synced to Supabase successfully');
-    return true;
+    return data.user as SupabaseUser;
   } catch (error) {
     console.error('Failed to sync user to Supabase:', error);
-    return false;
+    return null;
+  }
+}
+
+// Helper function to fetch user data from Supabase
+async function fetchSupabaseUser(firebaseUid: string): Promise<SupabaseUser | null> {
+  try {
+    const response = await fetch(`/api/users?firebase_uid=${firebaseUid}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data.user as SupabaseUser | null;
+  } catch (error) {
+    console.error('Failed to fetch Supabase user:', error);
+    return null;
   }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
       
-      // Sync verified users to Supabase on auth state change
-      if (user && user.emailVerified) {
-        const providerId = user.providerData[0]?.providerId;
+      // Sync verified users to Supabase on auth state change and fetch user data
+      if (firebaseUser && firebaseUser.emailVerified) {
+        const providerId = firebaseUser.providerData[0]?.providerId;
         let provider: 'google' | 'github' | 'email' = 'email';
         if (providerId === 'google.com') {
           provider = 'google';
         } else if (providerId === 'github.com') {
           provider = 'github';
         }
-        await syncUserToSupabase(user, provider);
+        
+        // Sync and get updated user data
+        const syncedUser = await syncUserToSupabase(firebaseUser, provider);
+        if (syncedUser) {
+          setSupabaseUser(syncedUser);
+        } else {
+          // Fallback: try to fetch user data directly
+          const fetchedUser = await fetchSupabaseUser(firebaseUser.uid);
+          setSupabaseUser(fetchedUser);
+        }
+      } else {
+        setSupabaseUser(null);
       }
+      
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -181,7 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithGithub, signInWithEmail, signUpWithEmail, resendVerificationEmail, resetPassword, signOut }}>
+    <AuthContext.Provider value={{ user, supabaseUser, loading, signInWithGoogle, signInWithGithub, signInWithEmail, signUpWithEmail, resendVerificationEmail, resetPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   );
