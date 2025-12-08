@@ -8,6 +8,7 @@ import EmptyState from '../../components/EmptyState';
 import PageHeader from '../../components/PageHeader';
 import BackButton from '../../components/BackButton';
 import { Video } from '../../types/video';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ModuleKuppiPage() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -18,13 +19,16 @@ export default function ModuleKuppiPage() {
   const router = useRouter();
   const params = useParams();
   const moduleId = params.moduleId as string;
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!moduleId) return;
 
     const fetchVideos = async () => {
       try {
-        const res = await fetch(`/api/kuppis?moduleId=${moduleId}`);
+        // Pass user email for domain-based access filtering
+        const emailParam = user?.email ? `&userEmail=${encodeURIComponent(user.email)}` : '';
+        const res = await fetch(`/api/kuppis?moduleId=${moduleId}${emailParam}`);
         if (!res.ok) throw new Error('Failed to fetch videos');
         const data: Video[] = await res.json();
         setVideos(data);
@@ -39,7 +43,7 @@ export default function ModuleKuppiPage() {
     };
 
     fetchVideos();
-  }, [moduleId]);
+  }, [moduleId, user]);
 
   const handleBack = () => router.back();
   const handleToggleVideo = (id: number) => {

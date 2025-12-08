@@ -1,10 +1,30 @@
 import { NextResponse } from "next/server";
 import supabase from '../../../lib/supabase';
 
+// Helper function to check if user's email domain is allowed
+function canAccessVideo(userEmail, allowedDomains) {
+  // If no domain restrictions, video is public
+  if (!allowedDomains || allowedDomains.length === 0) {
+    return true;
+  }
+  
+  // If user is not logged in, they can't access restricted content
+  if (!userEmail) {
+    return false;
+  }
+  
+  // Extract domain from email (e.g., 'user@uom.lk' -> '@uom.lk')
+  const userDomain = '@' + userEmail.split('@')[1];
+  
+  // Check if user's domain is in the allowed list
+  return allowedDomains.includes(userDomain);
+}
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const moduleId = searchParams.get("moduleId");
+    const userEmail = searchParams.get("userEmail"); // Pass logged-in user's email
 
     if (!moduleId) {
       return NextResponse.json({ error: "moduleId is required" }, { status: 400 });
@@ -26,6 +46,7 @@ export async function GET(req) {
         description,
         language_code,
         created_at,
+        allowed_domains,
         owner:students(
           name
         )
@@ -39,7 +60,12 @@ export async function GET(req) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data);
+    // Filter videos based on user's email domain access
+    const accessibleVideos = data.filter(video => 
+      canAccessVideo(userEmail, video.allowed_domains)
+    );
+
+    return NextResponse.json(accessibleVideos);
 
   } catch (err) {
     return NextResponse.json({ error: err.message || 'Something went wrong' }, { status: 500 });
