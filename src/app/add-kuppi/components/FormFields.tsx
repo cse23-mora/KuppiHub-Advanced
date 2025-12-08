@@ -10,7 +10,12 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import Box from "@mui/material/Box";
-import { FormData } from "./types";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import LockIcon from "@mui/icons-material/Lock";
+import PublicIcon from "@mui/icons-material/Public";
+import { FormData, DOMAIN_OPTIONS } from "./types";
 
 interface FormFieldsProps {
   formData: FormData;
@@ -131,6 +136,134 @@ export default function FormFields({ formData, onChange }: FormFieldsProps) {
             },
           }}
         />
+      </Box>
+
+      {/* Access Restriction */}
+      <Box 
+        sx={{ 
+          border: "1px solid",
+          borderColor: formData.hasRestriction ? "primary.main" : "grey.300",
+          borderRadius: 2,
+          p: { xs: 2, sm: 2.5 },
+          bgcolor: formData.hasRestriction ? "primary.50" : "transparent",
+          transition: "all 0.2s ease",
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formData.hasRestriction}
+              onChange={(e) => {
+                onChange({ 
+                  hasRestriction: e.target.checked,
+                  allowedDomains: e.target.checked ? formData.allowedDomains : []
+                });
+              }}
+              sx={{ color: "primary.main" }}
+            />
+          }
+          label={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {formData.hasRestriction ? (
+                <LockIcon sx={{ fontSize: 20, color: "primary.main" }} />
+              ) : (
+                <PublicIcon sx={{ fontSize: 20, color: "grey.500" }} />
+              )}
+              <Typography 
+                sx={{ 
+                  fontSize: { xs: "0.85rem", sm: "0.9rem" },
+                  fontWeight: 500,
+                  color: formData.hasRestriction ? "primary.main" : "grey.700"
+                }}
+              >
+                Restrict access to specific email domains
+              </Typography>
+            </Box>
+          }
+        />
+        
+        {formData.hasRestriction && (
+          <Box sx={{ mt: 2, pl: { xs: 0, sm: 4 } }}>
+            <Typography 
+              sx={{ 
+                fontSize: { xs: "0.75rem", sm: "0.8rem" }, 
+                color: "grey.600",
+                mb: 1.5 
+              }}
+            >
+              Select which email domains can view this content:
+            </Typography>
+            
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {DOMAIN_OPTIONS.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={formData.allowedDomains.includes(option.value)}
+                      onChange={(e) => {
+                        const newDomains = e.target.checked
+                          ? [...formData.allowedDomains, option.value]
+                          : formData.allowedDomains.filter(d => d !== option.value);
+                        onChange({ allowedDomains: newDomains });
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography sx={{ fontSize: { xs: "0.8rem", sm: "0.85rem" } }}>
+                      {option.label}
+                    </Typography>
+                  }
+                />
+              ))}
+            </Box>
+
+            {formData.allowedDomains.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography 
+                  sx={{ 
+                    fontSize: { xs: "0.7rem", sm: "0.75rem" }, 
+                    color: "grey.500",
+                    mb: 1 
+                  }}
+                >
+                  Selected domains:
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {formData.allowedDomains.map((domain) => (
+                    <Chip
+                      key={domain}
+                      label={domain}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      onDelete={() => {
+                        onChange({ 
+                          allowedDomains: formData.allowedDomains.filter(d => d !== domain) 
+                        });
+                      }}
+                      sx={{ fontSize: { xs: "0.7rem", sm: "0.75rem" } }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {formData.hasRestriction && formData.allowedDomains.length === 0 && (
+              <Typography 
+                sx={{ 
+                  fontSize: { xs: "0.7rem", sm: "0.75rem" }, 
+                  color: "warning.main",
+                  mt: 1,
+                  fontStyle: "italic"
+                }}
+              >
+                ⚠️ Please select at least one domain, or uncheck the restriction
+              </Typography>
+            )}
+          </Box>
+        )}
       </Box>
     </Box>
   );

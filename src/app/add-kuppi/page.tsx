@@ -121,6 +121,12 @@ export default function AddKuppiPage() {
       return;
     }
 
+    // Validate domain restriction
+    if (formData.hasRestriction && formData.allowedDomains.length === 0) {
+      setSubmitStatus({ type: "error", message: "Please select at least one domain or disable the restriction" });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -137,6 +143,10 @@ export default function AddKuppiPage() {
         gdrive_cloud_video_urls: gdriveLinks.length > 0 ? gdriveLinks : null,
         onedrive_cloud_video_urls: onedriveLinks.length > 0 ? onedriveLinks : null,
         material_urls: materialLinks.length > 0 ? materialLinks : null,
+        // Domain restriction - null means public, array means restricted
+        allowed_domains: formData.hasRestriction && formData.allowedDomains.length > 0 
+          ? formData.allowedDomains 
+          : null,
       });
 
       if (!response.ok) {

@@ -14,6 +14,13 @@ import {
   validateUrl,
 } from "@/lib/validation";
 
+// Allowed domain options (must match frontend DOMAIN_OPTIONS)
+const ALLOWED_DOMAIN_OPTIONS = [
+  '@uom.lk',
+  '@cse.mrt.ac.lk',
+  '@gmail.com',
+] as const;
+
 // Helper function to get user ID from firebase_uid
 async function getUserIdFromFirebaseUid(firebaseUid: string): Promise<number | null> {
   const { data } = await supabase
@@ -94,6 +101,7 @@ export async function POST(request: NextRequest) {
       gdrive_cloud_video_urls,
       onedrive_cloud_video_urls,
       material_urls,
+      allowed_domains,
     } = body;
 
     // ============ INPUT VALIDATION ============
@@ -162,6 +170,21 @@ export async function POST(request: NextRequest) {
       student_id = await findOrCreateStudent(validatedIndexNo);
     }
 
+    // Validate allowed_domains if provided
+    let validatedAllowedDomains: string[] | null = null;
+    if (allowed_domains && Array.isArray(allowed_domains) && allowed_domains.length > 0) {
+      // Only allow domains from the predefined list
+      validatedAllowedDomains = allowed_domains.filter(
+        (domain: string) => 
+          typeof domain === 'string' && 
+          ALLOWED_DOMAIN_OPTIONS.includes(domain as typeof ALLOWED_DOMAIN_OPTIONS[number])
+      );
+      // If all domains were invalid, set to null (public)
+      if (validatedAllowedDomains.length === 0) {
+        validatedAllowedDomains = null;
+      }
+    }
+
     // Insert video with sanitized data
     const { data, error } = await supabase
       .from("videos")
@@ -178,6 +201,7 @@ export async function POST(request: NextRequest) {
         gdrive_cloud_video_urls: validGdriveLinks.length > 0 ? validGdriveLinks : null,
         onedrive_cloud_video_urls: validOnedriveLinks.length > 0 ? validOnedriveLinks : null,
         material_urls: validMaterialLinks.length > 0 ? validMaterialLinks : null,
+        allowed_domains: validatedAllowedDomains,
         published_at: new Date().toISOString().split("T")[0],
       })
       .select()

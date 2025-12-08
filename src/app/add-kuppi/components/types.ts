@@ -10,6 +10,13 @@ export interface ModuleSearchResult {
   video_count: number;
 }
 
+// Available domain options for access restriction
+export const DOMAIN_OPTIONS = [
+  { value: '@uom.lk', label: 'University of Moratuwa (@uom.lk)' },
+  { value: '@cse.mrt.ac.lk', label: 'CSE Department (@cse.mrt.ac.lk)' },
+  { value: '@gmail.com', label: 'Gmail Users (@gmail.com)' }
+] as const;
+
 export interface FormData {
   moduleId: number | null;
   moduleCode: string;
@@ -23,6 +30,9 @@ export interface FormData {
   gdriveLinks: LinkItem[];
   onedriveLinks: LinkItem[];
   materialLinks: LinkItem[];
+  // Domain restriction fields
+  hasRestriction: boolean;
+  allowedDomains: string[];
 }
 
 // Generate unique ID
@@ -42,6 +52,9 @@ export const initialFormData: FormData = {
   gdriveLinks: [],
   onedriveLinks: [],
   materialLinks: [],
+  // Domain restriction defaults
+  hasRestriction: false,
+  allowedDomains: [],
 };
 
 export type LinkCategory = "youtubeLinks" | "telegramLinks" | "gdriveLinks" | "onedriveLinks" | "materialLinks";
