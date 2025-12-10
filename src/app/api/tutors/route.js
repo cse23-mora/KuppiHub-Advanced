@@ -13,7 +13,7 @@ export async function GET() {
         image_url,
         linkedin_url,
         faculty:faculties(name),
-        department:departments(name),
+       
         videos:videos!inner(id, title, module_id, is_approved, is_hidden, modules(name))
       `)
       .neq('name', 'Unknown');  // filter out students with name = 'Unknown'

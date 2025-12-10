@@ -21,8 +21,15 @@ export default function WatchVideoPage() {
     
     if (data) {
       try {
+        // Decode from base64 and then from UTF-8
         const decoded = atob(data);
-        return JSON.parse(decoded) as VideoData;
+        const decodedStr = decodeURIComponent(
+          decoded
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        return JSON.parse(decodedStr) as VideoData;
       } catch (error) {
         console.error("Failed to decode video data:", error);
         return null;

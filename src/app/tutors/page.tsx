@@ -27,7 +27,11 @@ export default function StudentsPage() {
         const res = await fetch("./api/tutors"); // adjust endpoint if needed
         if (!res.ok) throw new Error("Failed to fetch students");
         const data = await res.json();
-        setStudents(data.students);
+        // Sort by kuppi count in descending order
+        const sortedStudents = data.students.sort(
+          (a: Student, b: Student) => b.video_count - a.video_count
+        );
+        setStudents(sortedStudents);
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
         else setError(String(err));
