@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import NotificationSnackbar from "./components/NotificationSnackbar";
+import AppDownloadBanner from "./components/AppDownloadBanner";
 import Providers from "./providers";
 
 const geistSans = Geist({
@@ -67,21 +68,21 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
-         
 
-<Script
-  async
-  src="https://www.googletagmanager.com/gtag/js?id=G-68J1S4VW95"
-  strategy="afterInteractive"
-/>
-<Script id="gtag-G-68J1S4VW95" strategy="afterInteractive">
-{`
+
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-68J1S4VW95"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-G-68J1S4VW95" strategy="afterInteractive">
+          {`
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-68J1S4VW95');
 `}
-</Script>
+        </Script>
 
       </head>
 
@@ -89,6 +90,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 min-h-screen flex flex-col`}
       >
         <Providers>
+          <AppDownloadBanner />
           <Header />
 
           <main className="flex-1">
@@ -98,7 +100,7 @@ export default function RootLayout({
           <Footer />
           <ScrollToTopButton />
         </Providers>
-        
+
         {/* <NotificationSnackbar /> */}
 
         {/* ✅ Google AdSense */}
