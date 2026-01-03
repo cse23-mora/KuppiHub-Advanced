@@ -125,11 +125,8 @@ function VideoCardContent({ video, moduleId }: { video: Video; moduleId: string 
           };
           // Encode to UTF-8 first, then base64 to handle non-ASCII characters
           const encodedData = btoa(
-            encodeURIComponent(JSON.stringify(videoData))
-              .split('')
-              .map(c => '%' === c[0] ? String.fromCharCode(parseInt(c.substr(1), 16)) : c)
-              .join('')
-          );
+  encodeURIComponent(JSON.stringify(videoData))
+);
           
           return (
             <motion.button
