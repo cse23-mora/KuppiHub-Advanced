@@ -1,66 +1,95 @@
 'use client';
 
-import { Container, Paper, Typography, Button, Box, Grid, Card, CardContent, Chip } from '@mui/material';
+import { Container, Paper, Typography, Button, Box, Grid, Card, CardContent, Chip, Skeleton, Alert } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import AndroidIcon from '@mui/icons-material/Android';
 import AppleIcon from '@mui/icons-material/Apple';
 import WindowsIcon from '@mui/icons-material/Window';
 import ComputerIcon from '@mui/icons-material/Computer';
+import { useEffect, useState } from 'react';
 
-interface DownloadLink {
-    name: string;
+interface ProcessedAsset {
     platform: string;
-    icon: React.ReactElement;
+    platformName: string;
+    fileName: string;
     size: string;
     url: string;
     sha256: string;
-    version: string;
+    icon: string;
     color: string;
 }
 
+interface ReleaseData {
+    success: boolean;
+    version: string;
+    releaseName: string;
+    releaseNotes: string;
+    publishedAt: string;
+    downloads: ProcessedAsset[];
+}
+
+interface DownloadLink extends ProcessedAsset {
+    name: string;
+    iconElement: React.ReactElement;
+}
+
+const getIconElement = (iconType: string) => {
+    switch (iconType) {
+        case 'android':
+            return <AndroidIcon sx={{ fontSize: 48 }} />;
+        case 'apple':
+            return <AppleIcon sx={{ fontSize: 48 }} />;
+        case 'windows':
+            return <WindowsIcon sx={{ fontSize: 48 }} />;
+        default:
+            return <ComputerIcon sx={{ fontSize: 48 }} />;
+    }
+};
+
 export default function DownloadPage() {
-    const downloads: DownloadLink[] = [
-        {
-            name: 'KuppiHub for Android',
-            platform: 'Android',
-            icon: <AndroidIcon sx={{ fontSize: 48 }} />,
-            size: '2.66 MB',
-            url: 'https://github.com/cse23-mora/Kuppihub-APP/releases/download/v1.0.3/composeApp-release.apk',
-            sha256: '89883d02a8eb866937945146006d703b0a1e5f80c697a1b41c7a4cdad4a0c5b6',
-            version: 'v1.0.3',
-            color: '#3DDC84',
-        },
-        {
-            name: 'KuppiHub for macOS',
-            platform: 'macOS',
-            icon: <AppleIcon sx={{ fontSize: 48 }} />,
-            size: '178 MB',
-            url: 'https://github.com/cse23-mora/Kuppihub-APP/releases/download/v1.0.3/org.kuppihub.app-1.0.0.dmg',
-            sha256: 'eddd28546696cc13e95599680bb4edf7db22649107ee1d7a5a015268855cf467',
-            version: 'v1.0.3',
-            color: '#000000',
-        },
-        {
-            name: 'KuppiHub for Windows',
-            platform: 'Windows',
-            icon: <WindowsIcon sx={{ fontSize: 48 }} />,
-            size: '167 MB',
-            url: 'https://github.com/cse23-mora/Kuppihub-APP/releases/download/v1.0.3/org.kuppihub.app-1.0.0.msi',
-            sha256: '90d4b354d8f06628cf043bbdd8ae6285bec45b34c61ba0739f1d5738cd1f4',
-            version: 'v1.0.3',
-            color: '#0078D4',
-        },
-        {
-            name: 'KuppiHub for Linux',
-            platform: 'Linux (Debian/Ubuntu)',
-            icon: <ComputerIcon sx={{ fontSize: 48 }} />,
-            size: '158 MB',
-            url: 'https://github.com/cse23-mora/Kuppihub-APP/releases/download/v1.0.3/org.kuppihub.app_1.0.0_amd64.deb',
-            sha256: 'e3d6d6826c82f755316b734cba708565845af8226beae01467164c545ebfabeb',
-            version: 'v1.0.3',
-            color: '#E95420',
-        },
-    ];
+    const [downloads, setDownloads] = useState<DownloadLink[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [version, setVersion] = useState('');
+    const [releaseName, setReleaseName] = useState('');
+    const [releaseNotes, setReleaseNotes] = useState('');
+    const [publishedAt, setPublishedAt] = useState('');
+
+    useEffect(() => {
+        const fetchReleaseData = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('/api/releases/latest');
+                const data: ReleaseData = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.downloads ? 'Failed to fetch release data' : 'API error');
+                }
+
+                // Transform downloaded data to include icon elements
+                const downloadsWithIcons = data.downloads.map((download) => ({
+                    ...download,
+                    name: `KuppiHub for ${download.platform}`,
+                    iconElement: getIconElement(download.icon),
+                }));
+
+                setDownloads(downloadsWithIcons);
+                setVersion(data.version);
+                setReleaseName(data.releaseName);
+                setReleaseNotes(data.releaseNotes);
+                setPublishedAt(data.publishedAt);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching releases:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load releases');
+                setDownloads([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReleaseData();
+    }, []);
 
     return (
         <div className="min-h-screen py-8 bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -82,66 +111,132 @@ export default function DownloadPage() {
                     <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
                         Get the KuppiHub app on your favorite platform. Study smarter, together!
                     </Typography>
-                    <Chip
-                        label="Latest Version: v1.0.3"
-                        color="primary"
-                        sx={{ fontSize: '1rem', py: 2.5, px: 1 }}
-                    />
+                    {loading ? (
+                        <Skeleton variant="rectangular" width={200} height={40} sx={{ mx: 'auto' }} />
+                    ) : (
+                        <Box>
+                            <Chip
+                                label={`Latest Version: ${version}`}
+                                color="primary"
+                                sx={{ fontSize: '1rem', py: 2.5, px: 1, mr: 1 }}
+                            />
+                            {releaseName && (
+                                <Chip
+                                    label={releaseName}
+                                    color="secondary"
+                                    variant="outlined"
+                                    sx={{ fontSize: '0.9rem', py: 2.5, px: 1 }}
+                                />
+                            )}
+                        </Box>
+                    )}
+                    {publishedAt && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+                            Published on {new Date(publishedAt).toLocaleDateString()}
+                        </Typography>
+                    )}
                 </Box>
 
+                {/* Error Alert */}
+                {error && (
+                    <Alert severity="warning" sx={{ mb: 4 }}>
+                        {error}. Please check back later or visit our GitHub releases page.
+                    </Alert>
+                )}
+
+                {/* Release Notes */}
+                {releaseNotes && (
+                    <Paper elevation={2} sx={{ mb: 6, p: 3, bgcolor: 'rgba(102, 126, 234, 0.05)', borderLeft: '4px solid #667eea' }}>
+                        <Typography variant="h6" gutterBottom fontWeight={600} color="primary">
+                            Release Notes
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {releaseNotes || 'No release notes available.'}
+                        </Typography>
+                    </Paper>
+                )}
+
                 {/* Download Cards */}
-                <Grid container spacing={3}>
-                    {downloads.map((download, index) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                            <Card
-                                elevation={3}
-                                sx={{
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    transition: 'all 0.3s ease',
-                                    '&:hover': {
-                                        transform: 'translateY(-8px)',
-                                        boxShadow: 6,
-                                    }
-                                }}
-                            >
-                                <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 3 }}>
-                                    <Box sx={{ color: download.color, mb: 2 }}>
-                                        {download.icon}
-                                    </Box>
-                                    <Typography variant="h6" component="h2" gutterBottom fontWeight={600}>
-                                        {download.platform}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                                        {download.name}
-                                    </Typography>
-                                    <Box sx={{ my: 2 }}>
-                                        <Chip label={download.size} size="small" sx={{ mr: 1 }} />
-                                        <Chip label={download.version} size="small" color="primary" variant="outlined" />
-                                    </Box>
-                                    <Button
-                                        variant="contained"
-                                        startIcon={<DownloadIcon />}
-                                        fullWidth
-                                        href={download.url}
-                                        sx={{
-                                            mt: 2,
-                                            py: 1.5,
-                                            background: `linear-gradient(45deg, ${download.color} 30%, ${download.color}dd 90%)`,
-                                            fontWeight: 600,
-                                            '&:hover': {
-                                                background: `linear-gradient(45deg, ${download.color}dd 30%, ${download.color}aa 90%)`,
-                                            }
-                                        }}
-                                    >
-                                        Download
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                {loading ? (
+                    <Grid container spacing={3} sx={{ mb: 6 }}>
+                        {[1, 2, 3, 4].map((index) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+                                <Card elevation={3}>
+                                    <CardContent sx={{ p: 3 }}>
+                                        <Skeleton variant="rectangular" height={48} sx={{ mb: 2 }} />
+                                        <Skeleton variant="text" />
+                                        <Skeleton variant="text" />
+                                        <Skeleton variant="rectangular" height={40} sx={{ mt: 2 }} />
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                ) : downloads.length > 0 ? (
+                    <Grid container spacing={3}>
+                        {downloads.map((download, index) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+                                <Card
+                                    elevation={3}
+                                    sx={{
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-8px)',
+                                            boxShadow: 6,
+                                        }
+                                    }}
+                                >
+                                    <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 3 }}>
+                                        <Box sx={{ color: download.color, mb: 2 }}>
+                                            {download.iconElement}
+                                        </Box>
+                                        <Typography variant="h6" component="h2" gutterBottom fontWeight={600}>
+                                            {download.platform}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                                            {download.name}
+                                        </Typography>
+                                        <Box sx={{ my: 2 }}>
+                                            <Chip label={download.size} size="small" sx={{ mr: 1 }} />
+                                            <Chip label={version} size="small" color="primary" variant="outlined" />
+                                        </Box>
+                                        {download.sha256 && (
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, wordBreak: 'break-all', maxWidth: '100%', fontSize: '0.75rem' }}>
+                                                SHA256: {download.sha256.substring(0, 16)}...
+                                            </Typography>
+                                        )}
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<DownloadIcon />}
+                                            fullWidth
+                                            href={download.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            sx={{
+                                                mt: 2,
+                                                py: 1.5,
+                                                background: `linear-gradient(45deg, ${download.color} 30%, ${download.color}dd 90%)`,
+                                                fontWeight: 600,
+                                                '&:hover': {
+                                                    background: `linear-gradient(45deg, ${download.color}dd 30%, ${download.color}aa 90%)`,
+                                                }
+                                            }}
+                                        >
+                                            Download
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                ) : (
+                    <Alert severity="error">
+                        No downloads available. Please try again later.
+                    </Alert>
+                )}
 
                 {/* Installation Instructions */}
                 <Paper elevation={2} sx={{ mt: 6, p: 4, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
