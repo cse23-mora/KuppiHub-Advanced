@@ -37,7 +37,7 @@ export default function AppDownloadBanner() {
             mountOnEnter
             unmountOnExit
         >
-            <div className="w-full">
+            <div className="w-full overflow-hidden">
                 <Fade in={isVisible} timeout={1000}>
                     <div className="w-full bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 shadow-lg animate-gradient">
                         <Alert
@@ -47,18 +47,31 @@ export default function AppDownloadBanner() {
                                 backgroundColor: 'transparent',
                                 color: 'white',
                                 borderRadius: 0,
+                                margin: 0,
+                                padding: '12px 16px',
                                 transition: 'all 0.3s ease-in-out',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                width: '100%',
+                                boxSizing: 'border-box',
                                 '& .MuiAlert-icon': {
                                     color: 'white',
+                                    marginRight: '12px',
+                                    minWidth: 'max-content',
                                 },
                                 '& .MuiAlert-message': {
+                                    padding: 0,
                                     width: '100%',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    overflow: 'hidden',
+                                },
+                                '& .MuiAlert-action': {
+                                    padding: 0,
+                                    marginLeft: '12px',
+                                    marginRight: 0,
                                 },
                                 '&:hover': {
                                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -73,6 +86,7 @@ export default function AppDownloadBanner() {
                                     sx={{
                                         color: 'white',
                                         transition: 'all 0.3s ease',
+                                        minWidth: 'max-content',
                                         '&:hover': {
                                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                             transform: 'rotate(90deg)',
@@ -85,9 +99,9 @@ export default function AppDownloadBanner() {
                         >
                             <Link
                                 href="/download"
-                                className="flex items-center justify-center w-full transition-all duration-300 hover:translate-x-1"
+                                className="flex items-center justify-center w-full transition-all duration-300 hover:translate-x-1 min-w-0"
                             >
-                                <span className="font-semibold text-sm sm:text-base text-center">
+                                <span className="font-semibold text-sm sm:text-base text-center truncate sm:truncate-none">
                                     🎉 KuppiHub App is now available! Download for Android, Windows, Mac & Linux →
                                 </span>
                             </Link>
