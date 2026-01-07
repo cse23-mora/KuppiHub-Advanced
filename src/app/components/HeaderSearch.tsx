@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Module {
   id: number;
@@ -18,13 +19,14 @@ interface DashboardModule {
 }
 
 export default function HeaderSearch() {
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Module[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [addedModules, setAddedModules] = useState<Set<number>>(new Set());
 
-  // Load already added modules from localStorage when search opens
+  // Load already added modules when search opens
   useEffect(() => {
     if (searchOpen && typeof window !== "undefined") {
       try {
@@ -59,7 +61,7 @@ export default function HeaderSearch() {
     return () => clearTimeout(debounceTimeout);
   }, [query]);
 
-  const handleAddToDashboard = (mod: Module) => {
+  const handleAddToDashboard = async (mod: Module) => {
     if (typeof window === "undefined") return;
     
     try {
@@ -83,6 +85,30 @@ export default function HeaderSearch() {
       };
       
       existing.push(newModule);
+      
+      // If logged in, sync to database immediately
+      if (user?.uid) {
+        try {
+          const response = await fetch('/api/user-dashboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firebase_uid: user.uid,
+              moduleIds: existing.map(m => m.module_id),
+            }),
+          });
+          
+          if (!response.ok) {
+            console.error('Failed to sync to database');
+            // Still save locally even if sync fails
+          }
+        } catch (err) {
+          console.error('Failed to sync to database:', err);
+          // Still save locally even if sync fails
+        }
+      }
+      
+      // Always save to localStorage
       localStorage.setItem("dashboardModules", JSON.stringify(existing));
       setAddedModules(prev => new Set([...prev, mod.id]));
       

@@ -142,40 +142,27 @@ export default function DashboardPage() {
     if (typeof window === "undefined" || authLoading) return;
 
     const initializeModules = async () => {
-      const localModules = loadModulesFromLocal();
-      
       if (user?.uid) {
-        // User is logged in - check cloud storage
+        // User is logged in - load from database only
         const cloudModuleIds = await loadFromCloud();
         
         if (cloudModuleIds && cloudModuleIds.length > 0) {
-          // Merge local and cloud (cloud takes priority for IDs that exist in both)
-          const localIds = new Set(localModules.map(m => m.module_id));
-          const cloudIds = new Set(cloudModuleIds);
-          
-          // Get all unique IDs
-          const allIds = Array.from(new Set([...localIds, ...cloudIds]));
-          
-          // Fetch fresh data for all modules
-          const freshModules = await fetchModuleDetails(allIds as number[]);
+          // Fetch fresh data for cloud modules
+          const freshModules = await fetchModuleDetails(cloudModuleIds as number[]);
           
           if (freshModules.length > 0) {
             setModules(freshModules);
             saveModulesToLocal(freshModules);
-            await syncToCloud(freshModules);
           } else {
-            // Fallback to local if API fails
-            setModules(localModules);
+            setModules([]);
           }
-        } else if (localModules.length > 0) {
-          // No cloud data but local data exists - sync local to cloud
-          setModules(localModules);
-          await syncToCloud(localModules);
         } else {
+          // No modules in database for this user
           setModules([]);
         }
       } else {
-        // Not logged in - use local only
+        // Not logged in - use local storage only
+        const localModules = loadModulesFromLocal();
         setModules(localModules);
         if (localModules.length > 0) {
           refreshModuleCounts(localModules);
@@ -184,7 +171,7 @@ export default function DashboardPage() {
     };
 
     initializeModules();
-  }, [user, authLoading, loadFromCloud, loadModulesFromLocal, fetchModuleDetails, saveModulesToLocal, syncToCloud]);
+  }, [user, authLoading, loadFromCloud, loadModulesFromLocal, fetchModuleDetails, saveModulesToLocal]);
 
   // Listen for updates from HeaderSearch
   useEffect(() => {
