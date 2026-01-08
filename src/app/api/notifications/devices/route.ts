@@ -5,71 +5,46 @@ import { authenticateRequest } from "@/lib/firebase-admin";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { fcm_token, user_id, device_type = "android", app_version } = body;
+    // 1. CHANGED: Accept 'firebase_uid' (String) instead of 'user_id' (Number)
+    const { fcm_token, firebase_uid, device_type = "android", app_version } = body;
 
-    // Validate FCM token
     if (!fcm_token || typeof fcm_token !== "string" || fcm_token.trim() === "") {
-      return NextResponse.json(
-        { error: "Valid fcm_token is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Valid fcm_token is required" }, { status: 400 });
     }
 
     const trimmedToken = fcm_token.trim();
+    let internalSqlId: number | null = null;
 
-    // If user_id is provided, verify authentication & ownership
-    let verifiedUserId: number | null = null;
-    if (user_id) {
-      // ============ AUTHENTICATION CHECK ============
+    // 2. If a user is claiming this device
+    if (firebase_uid) {
+      // A. Verify Auth Header
       const authHeader = request.headers.get("authorization");
       const verifiedUser = await authenticateRequest(authHeader);
 
       if (!verifiedUser) {
-        return NextResponse.json(
-          { error: "Unauthorized. Please log in to link a device." },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
-      if (typeof user_id !== "number") {
-        return NextResponse.json(
-          { error: "user_id must be a number" },
-          { status: 400 }
-        );
+      // B. Security Check: Ensure the token belongs to the user claiming the device
+      if (verifiedUser.uid !== firebase_uid) {
+        return NextResponse.json({ error: "Forbidden: UID Mismatch" }, { status: 403 });
       }
 
-      // Get verified user's ID from database
-      const { data: verifiedUserData } = await supabase
+      // C. Look up the SQL ID from the 'users' table using the Firebase UID
+      const { data: userData, error: userError } = await supabase
         .from("users")
         .select("id")
-        .eq("firebase_uid", verifiedUser.uid)
+        .eq("firebase_uid", firebase_uid)
         .single();
 
-      if (!verifiedUserData) {
-        return NextResponse.json(
-          { error: "User not found" },
-          { status: 404 }
-        );
+      if (userError || !userData) {
+        return NextResponse.json({ error: "User not found in database" }, { status: 404 });
       }
 
-      // Only allow users to link their own device
-      if (verifiedUserData.id !== user_id) {
-        return NextResponse.json(
-          { error: "Cannot link device to another user" },
-          { status: 403 }
-        );
-      }
-
-      verifiedUserId = user_id;
+      internalSqlId = userData.id; // This is the Number (e.g., 55)
     }
 
-    // Validate device_type
-    const validDeviceTypes = ["android", "ios", "web"];
-    const validatedDeviceType = validDeviceTypes.includes(device_type)
-      ? device_type
-      : "android";
-
-    // Check if device already exists
+    // 3. Use 'internalSqlId' for the database operations
     const { data: existingDevice } = await supabase
       .from("user_devices")
       .select("id")
@@ -78,65 +53,41 @@ export async function POST(request: NextRequest) {
 
     let result;
     if (existingDevice) {
-      // UPDATE existing device
       const { data, error } = await supabase
         .from("user_devices")
         .update({
-          user_id: verifiedUserId,
-          device_type: validatedDeviceType,
+          user_id: internalSqlId, // Use the looked-up integer
+          device_type: device_type,
           app_version: app_version || null,
           last_active: new Date().toISOString(),
         })
         .eq("fcm_token", trimmedToken)
         .select()
         .single();
-
-      if (error) {
-        console.error("Error updating device:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
-
-      result = {
-        success: true,
-        message: "Device registered successfully",
-        action: "updated",
-        data,
-      };
+        
+       if (error) throw error; 
+       result = { success: true, action: "updated", data };
     } else {
-      // INSERT new device
       const { data, error } = await supabase
         .from("user_devices")
         .insert({
-          user_id: verifiedUserId,
+          user_id: internalSqlId, // Use the looked-up integer
           fcm_token: trimmedToken,
-          device_type: validatedDeviceType,
+          device_type: device_type,
           app_version: app_version || null,
           last_active: new Date().toISOString(),
         })
         .select()
         .single();
 
-      if (error) {
-        console.error("Error inserting device:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
-
-      result = {
-        success: true,
-        message: "Device registered successfully",
-        action: "created",
-        data,
-      };
+       if (error) throw error;
+       result = { success: true, action: "created", data };
     }
 
     return NextResponse.json(result);
+
   } catch (error) {
-    console.error("Error in register device API:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Something went wrong",
-      },
-      { status: 500 }
-    );
+    console.error("Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
