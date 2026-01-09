@@ -24,28 +24,28 @@ function getAssetPlatformInfo(fileName: string): {
     icon: string;
     color: string;
 } | null {
-    if (fileName.includes('composeApp-release.apk')) {
+    if (fileName.endsWith('.apk') && !fileName.includes('debug')) {
         return {
             platform: 'Android',
             platformName: 'Android',
             icon: 'android',
             color: '#3DDC84',
         };
-    } else if (fileName.includes('.dmg')) {
+    } else if (fileName.endsWith('.dmg')) {
         return {
             platform: 'macOS',
             platformName: 'macOS',
             icon: 'apple',
             color: '#000000',
         };
-    } else if (fileName.includes('.msi')) {
+    } else if (fileName.endsWith('.msi')) {
         return {
             platform: 'Windows',
             platformName: 'Windows',
             icon: 'windows',
             color: '#0078D4',
         };
-    } else if (fileName.includes('.deb')) {
+    } else if (fileName.endsWith('.deb')) {
         return {
             platform: 'Linux',
             platformName: 'Linux (Debian/Ubuntu)',
