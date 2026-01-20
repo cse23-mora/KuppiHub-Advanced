@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import supabase from '@/lib/supabase';
+export const dynamic = "force-dynamic";
 
 // GET /api/hierarchy - Fetch the faculty hierarchy JSONB data
 export async function GET() {
@@ -26,7 +27,13 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(data.data);
+    return NextResponse.json(data.data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+        "Vary": "Accept-Encoding",
+      },
+});
+
   } catch (error) {
     console.error('Unexpected error:', error);
     return NextResponse.json(
